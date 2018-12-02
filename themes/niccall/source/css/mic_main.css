@@ -10,6 +10,7 @@
 		font-size: 100%;
 		font: inherit;
 		vertical-align: baseline;
+		cursor: alias;
 	}
 
 	footer, header,nav {
@@ -50,9 +51,9 @@
 			width: 100%;
 			height: 100%;
 			background-color: transparent;
-			-webkit-background-size: cover;/* 兼容Webkit内核浏览器如 Chrome和Safari */ 
-			-o-background-size: cover;/* 兼容Opera */ 
-			zoom: 1; 
+			-webkit-background-size: cover;/* 兼容Webkit内核浏览器如 Chrome和Safari */
+			-o-background-size: cover;/* 兼容Opera */
+			zoom: 1;
 			z-index: -1;
 		}
 		#wrapper.fade-in:before {
@@ -1395,7 +1396,7 @@
 	}
 
 		#main > * {
-			
+
 			border-top: solid 2px #eeeeee;
 			margin: 0;
 		}
@@ -2049,7 +2050,7 @@
 		#navPanel li > a
 		{
 			color: #000;
-		} 
+		}
 		#navPanel .links {
 			list-style: none;
 			padding-left: 0;
@@ -2180,7 +2181,7 @@
 /*---------mainfirst------------------*/
 /* Me */
 	#main{
-		margin-bottom: 0.5rem;	
+		margin-bottom: 0.5rem;
 	}
 	#main .header .h1 {
 		color: #000;
@@ -2279,7 +2280,7 @@
 
 			#me {
 				padding: 0;
-				margin-right: 3rem; 
+				margin-right: 3rem;
 				height: 20em;
 			}
 
@@ -2401,7 +2402,7 @@
 
 			#main {
 				background: none;
-				
+
 			}
 
 			.panel {
@@ -2421,7 +2422,7 @@
 			#me .pic {
 				width: 100%;
 				padding-bottom: 1rem;
-				
+
 			}
 
 				#me .pic img {
@@ -4172,7 +4173,7 @@
 		link_box-shadow: 0 2px 0 0 #e5e5e5;
 		margin: 0 0 2em 0;
 		padding-bottom: 2rem;
-		
+
 	}
 
 		.link_box > :last-child {
@@ -4200,7 +4201,7 @@
 
 			.link_box.features .features-row section {
 				float: left;
-				
+
 				width: 50%;
 			}
 
@@ -4308,7 +4309,7 @@
 	.page_title{
 		position: relative;
 		width: 100%;
-		height:300px; 
+		height:300px;
 		_height:expression(this.height > 400 ? "400px" : this.height);
 	}
 	.page_title h1{
@@ -4384,13 +4385,13 @@
 	.post-content h2{
 		text-transform:none;
 		font-family: FZLT;
-		font-size: 2.5rem;	
+		font-size: 2.5rem;
 	}
 	.post-content h3{
 		text-transform:none;
 		font-family: FZLT;
 		font-size: 2rem;
-		
+
 	}
 	.post-content h4{
 		text-transform:none;
@@ -4416,13 +4417,13 @@
 		color: #00E5EE;
 	}
 	.post-content img{
-		max-width:100%; 
+		max-width:100%;
 	}
 	.post_page_title_img a{
 		position:absolute;
 		text-shadow:6px 5px 10px #000;
 		padding-top: 20%;
-		border-bottom:none; 
+		border-bottom:none;
 	}
 	.post_page_title_img a > h2{
 		font-size: 3rem;
