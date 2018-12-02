@@ -12,15 +12,21 @@
     <noscript>
         <link rel="stylesheet" href="<%- config.root %>css/noscript.css" />
     </noscript>
+    <div class="back"></div>
     <style type="text/css">
-        body:before {
-          content: ' ';
+        .back {
           position: fixed;
           top: 0;
-          background: url('<%- config.root %>img/<%- Math.floor((new Date().getMinutes() + 1) / 2) %>.jpg') center 0 no-repeat;
           right: 0;
           bottom: 0;
           left: 0;
+          background-position: center 0;
+          background-repeat: no-repeat;
           background-size: cover;
         }
     </style>
+    <script>
+      let url = `<%- config.root %>img/${Math.floor((new Date().getMinutes() + 1) / 2)}.jpg`
+      var back = document.querySelector('.back')
+      back.style.backgroundImage = `url(${url})`
+    </script>
