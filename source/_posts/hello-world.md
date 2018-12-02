@@ -3,7 +3,6 @@ title: # 文章标题
 date: 2018/12/03 13:48:25
 tags:
 - 标签1
-- 标签2 (可选)
 categories: hello
 thumbnail: https://atom-morgan.github.io/images/hello-world/tutorial-hello-world.png
 ---
