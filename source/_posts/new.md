@@ -71,8 +71,8 @@ function objectFactory() { // 我们使用函数 来模拟new关键字
 
 ```js
 Object.create =  function (o) {
-    var F = function () {}
-    F.prototype = o
+    var F = function () {} // 创建新的函数对象
+    F.prototype = o // 将F的原型指向 参数o
     return new F()
 }
 ```
