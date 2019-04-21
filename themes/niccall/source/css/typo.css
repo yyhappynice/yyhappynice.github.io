@@ -185,7 +185,7 @@ pre {
 /* 一致化 horizontal rule */
 hr {
   border: none;
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 2px dashed #e9dcdc;
   margin-bottom: 0.8em;
   height: 10px;
 }
@@ -277,10 +277,16 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: none;
 }
 
-.typo h5, .typo h6, .typo-h5, .typo-h6 {
+.typo h5, .typo-h5{
   font-size: 1.2em;
   text-transform: none;
 }
+
+.typo h6, .typo-h6 {
+  font-size: 1em;
+  text-transform: none;
+}
+
 
 /* 在文章中，应该还原 ul 和 ol 的样式 */
 .typo ul, .typo-ul {

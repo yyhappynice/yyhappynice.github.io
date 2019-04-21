@@ -1,9 +1,9 @@
 ---
 title: # new
-date: 2018/12/03 13:48:25
+date: 2018/12/10 13:48:25
 tags:
 - js
-categories: new
+categories: js-new
 thumbnail: https://atom-morgan.github.io/images/hello-world/tutorial-hello-world.png
 ---
 今天我们来介绍一下new 😋 用一句话来概括：new 运算符创建一个用户定义的__对象类型的__实例或具有构造函数的__内置对象__的实例。
