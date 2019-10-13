@@ -1,5 +1,5 @@
 ---
-thumbnail: https://images.gitee.com/uploads/images/2018/1203/182131_241c249c_2334971.jpeg
+thumbnail: https://user-images.githubusercontent.com/12566627/62339199-bf49d500-b50d-11e9-82e7-8ba98e72c3dd.jpg
 ---
 # ABOUT ME
 前端小码农一枚～😊

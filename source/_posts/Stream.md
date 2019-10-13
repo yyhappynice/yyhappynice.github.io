@@ -2,8 +2,8 @@
 title: Stream
 date: 2018-12-18 09:03:34
 tags: js
-categories: Stream
-thumbnail: https://user-images.githubusercontent.com/12566627/56256210-3d6aa300-60fa-11e9-98f3-4934d1def645.jpeg
+categories: node 中的流 Stream
+thumbnail: https://user-images.githubusercontent.com/12566627/66715019-cc7a1e80-edf0-11e9-8903-79b27e2165ac.jpg
 ---
 流（stream）是 Node.js 中处理流式数据的抽象接口。 stream 模块用于构建实现了流接口的对象。Node.js 提供了多种流对象。 例如，[HTTP](http://nodejs.cn/api/http.html#http_class_http_incomingmessage) 服务器的请求和 [process.stdout](http://nodejs.cn/api/process.html#process_process_stdout) 都是流的实例。流可以是可读的、可写的、或者可读可写的。 所有的流都是 [EventEmitter](http://nodejs.cn/api/events.html#events_class_eventemitter) 的实例。
 
