@@ -1,6 +1,6 @@
 ---
 title: Stream
-date: 2018-12-18 09:03:34
+date: 2018-12-25 09:03:34
 tags: js
 categories: node 中的流 Stream
 thumbnail: https://user-images.githubusercontent.com/12566627/66715019-cc7a1e80-edf0-11e9-8903-79b27e2165ac.jpg
@@ -17,3 +17,6 @@ ps -ef | grep node
 
 在node中流分为四种：[Readable]()
 [123](https://juejin.im/post/5c77b46df265da2dea053df5?utm_source=gold_browser_extension)
+
+
+### 参考
