@@ -42,6 +42,8 @@ for (macroTask of macroTaskQueue) {
 ```
 ------
 ### Vue nextTick 的实现[（2.6）](https://github.com/vuejs/vue/blob/dev/src/core/util/next-tick.js)
+nextTick的实现，主要是要想在 microTask 列队中增加 function，在当前栈执行完成后执行 nextTick 传入的 funtion，源码如下：
+
 ```js
 import { noop } from 'shared/util'
 import { handleError } from './error'
@@ -243,3 +245,5 @@ __注意：__ 在 queueWatcher 函数中，执行了 [nextTick(flushSchedulerQue
 ## 参考
 [js事件循环机制](http://lynnelv.github.io/js-event-loop-browser)
 [你真的理解$nextTick么](https://juejin.im/post/5cd9854b5188252035420a13)
+[Vue.js 技术揭秘](https://ustbhuangyi.github.io/vue-analysis/reactive/setters.html#%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90)
+[从Vue.js源码看异步更新DOM策略及nextTick](https://juejin.im/post/59c7b25a5188257a125d7a98)

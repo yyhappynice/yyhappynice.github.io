@@ -27,6 +27,11 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section 
   display: block;
 }
 
+details:focus, summary:focus{
+    outline:none;
+    border: 0;
+}
+
 /* HTML5 媒体文件跟 img 保持一致 */
 audio, canvas, video {
   display: inline-block;
