@@ -4,7 +4,7 @@ date: 2019-03-08 15:03:08
 tags:
 - js
 categories: LRU-Cache 缓存
-thumbnail: https://user-images.githubusercontent.com/12566627/66709337-53e57480-ed94-11e9-84dd-3264983a0a6d.jpg
+thumbnail: https://user-images.githubusercontent.com/12566627/67846237-d5325a80-fb3b-11e9-9762-2212c3d7e979.jpg
 ---
 前段时间 在项目中使用vue做服务端渲染，并且对渲染出来的页面用 [lru-cache](https://github.com/isaacs/node-lru-cache) 库在前端做了缓存，来减轻服务器压力～。在[Leetcode](https://leetcode-cn.com/problems/lru-cache/)上又遇到了这道题目，在此记录一下～😍
 

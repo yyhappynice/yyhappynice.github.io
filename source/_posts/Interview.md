@@ -13,8 +13,20 @@ thumbnail: https://user-images.githubusercontent.com/12566627/66701668-464ad300-
 ### js 相关
 __`['1', '2', '3'].map(parseInt)`__
 
-2、bind实现
+2、call实现
+```js
+Function.prototype.call = function (context) {
+  context = context ? Object(context) : window;
+  var fn = Symbol(); // added
+  context[fn] = this; // changed
 
+  let args = [...arguments].slice(1);
+  let result = context[fn](...args); // changed
+
+  delete context[fn]; // changed
+  return result;
+}
+```
 __this 指向__
 >this的指向是在函数调用的时候确定下来的, this的指向大致可以分为五种。
 1、 默认绑定: 指向全局对象，严格模式为undefined
@@ -34,7 +46,13 @@ __数组扁平化__
 //或
 Array.from(new Set(arr.flat(Infinity))).sort((a,b)=>{ return a-b})
 ```
-
+```js
+function flatten(arr) {
+    return arr.reduce((result, item)=> {
+        return result.concat(Array.isArray(item) ? flatten(item) : item)
+    }, [])
+}
+```
 __React 中 setState 什么时候是同步的，什么时候是异步的？__
 [解答](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/17)
 
@@ -88,17 +106,13 @@ function trim(str) {
     return str.replace(/^\s+|\s+$/g, '')
 }
 ```
-
-__实现 Promise.finally__
+__千分位分隔__
 ```js
-Promise.prototype.finally = function (callback) {
-  let P = this.constructor
-  return this.then(
-    value  => P.resolve(callback()).then(() => value),
-    reason => P.resolve(callback()).then(() => { throw reason })
-  )
+function format(str) {
+    return str.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
 }
 ```
+
 
 __Vue 组件 data 为什么必须是函数__
 >当一个组件被定义， data 必须声明为返回一个初始数据对象的函数，因为组件可能被用来创建多个实例。如果 data 仍然是一个纯粹的对象，则所有的实例将共享引用同一个数据对象！通过提供 data 函数，每次创建一个新实例后，我们能够调用 data 函数，从而返回初始数据的一个全新副本数据对象。
@@ -126,13 +140,67 @@ __网页从输入网址到渲染完成经历了哪些过程__
 7、js如果样式或DOM有更改，则浏览器会重新生成render tree，进行重绘和重排
 </details>
 
+__Promise 实现__
+[1、](https://zhuanlan.zhihu.com/p/60836800)
+[2、](https://juejin.im/post/5df4fac1518825125c430544)
 
+__如何停掉 Promise 链__
+[链接](https://github.com/xieranmaya/blog/issues/5)
 
+__Promise.all 使用及实现__
+[链接](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/130#issuecomment-535074526)
+[链接](https://segmentfault.com/a/1190000014424410)
+__实现 Promise.finally__
+```js
+Promise.prototype.finally = function (fn) {
+  return this.then(value => {
+        fn()
+        return value
+    }, reason => {
+        fn()
+        throw reason
+    });
+}
+```
+__resolve/reject__
+```js
+static resolve(val) {
+    return new Promise((resolve, reject) => {
+        resolve(val)
+    })
+}
+static reject(val) {
+    return new Promise((resolve, reject) => {
+        reject(val)
+    })
+}
+```
+__Promise实现 timeout__
+[链接](https://www.cnblogs.com/shytong/p/5681568.html)
 
+__理解 ES6 Iterator__
+[链接](https://juejin.im/post/5dd3540df265da0c0a143f5d)
 
+__Javascript中装饰器的实现原理__
+[Javascript中装饰器的实现原理](https://github.com/zz1211/Doraemon/issues/1)
+[Javascript 中的装饰器](https://aotu.io/notes/2016/10/24/decorator/index.html)
+
+__setState 同步异步__
+[深入setState](https://luckyabby.com/posts/%E6%B7%B1%E5%85%A5setstate/)
+
+__BFC 概念__
+[理解 BFC 原理](https://zhuanlan.zhihu.com/p/25321647)
+
+__webpack Scope Hoisting__
+[Scope Hoisting](https://imweb.io/topic/5a43064fa192c3b460fce360)
 ### http 相关
+[http状态码](https://tool.lu/httpcode/)
+[总结](https://github.com/forthealllight/blog/issues/19)
 
+### node 相关
+(10 道 Nodejs 进程相关面试题)[https://mp.weixin.qq.com/s?__biz=MzIyNDU2NTc5Mw==&mid=2247483763&idx=3&sn=bc42cd19a05044280e3b1061adbc8225&chksm=e80c4e3ddf7bc72bc1891f624b6e74ada7ca868337f5f002cf14368f372b08c66e397828ac5e&token=108126567&lang=zh_CN#rd]
 
-
+### 二叉树
+[链接](https://segmentfault.com/a/1190000016914803)
 ## 参考
 [Daily-Interview-Question](https://github.com/Advanced-Frontend/Daily-Interview-Question)
