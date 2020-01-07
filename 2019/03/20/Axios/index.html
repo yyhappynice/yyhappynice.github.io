@@ -1,0 +1,451 @@
+<!DOCTYPE HTML>
+<html>
+
+<head><meta name="generator" content="Hexo 3.8.0">
+	<link rel="bookmark" type="image/x-icon" href="/img/logo.png">
+	<link rel="shortcut icon" href="/img/logo.png">
+	
+			    <title>
+    YuYiのblog
+    </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/css/mic_main.css">
+    <link rel="stylesheet" href="/css/dropdownMenu.css">
+    <meta name="keywords" content="web,node">
+    
+    	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	 
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css">
+    </noscript>
+    <div class="back"></div>
+    <style type="text/css">
+        .back {
+          position: fixed;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-position: center 0;
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+    </style>
+    <script>
+      let url = `/img/${Math.floor((new Date().getMinutes() + 1) / 2)}.jpg`
+      var back = document.querySelector('.back')
+      back.style.backgroundImage = `url(${url})`
+    </script>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+
+	
+</head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_default.css">
+<link rel="stylesheet" href="/css/typo.css">
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">MICCALL</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special">
+            <ul class="menu links">
+			<!-- Homepage  主页  --> 
+			<li>
+	            <a href="/" rel="nofollow">主页</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/about/" title="简历">
+		                简历
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="标签">
+		                标签
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+                    
+                    <li>
+                        <a title="Twitter" href="https://twitter.com/yyhappynice" target="_blank" rel="noopener">
+                            <i class="icon fa fa-Twitter"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="github" href="https://github.com/yyhappynice" target="_blank" rel="noopener">
+                            <i class="icon fa fa-github"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="500px" href="http://500px.com" target="_blank" rel="noopener">
+                            <i class="icon fa fa-500px"></i>
+                        </a>
+                    </li>
+                    
+			</ul>
+</nav>
+
+        <div id="main">
+            <div class="post_page_title_img" style="height: 25rem;background-image: url(https://user-images.githubusercontent.com/12566627/56471199-5cfb2600-6482-11e9-988c-b5ec24476492.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;">
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2>Axios</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <p>我们常常使用 axios 做接口请求库，它并且也是 vue 官方推荐的。axios 是一个基于 promise 的 http 库，同时支持浏览器与node端，下面我们就了解一下 axios 吧～ 🤗  ️</p>
+<p>Axios 的主要特性包括：</p>
+<blockquote>
+<p>从浏览器发出XMLHttpRequests<br>从node.js发出HTTP请求<br>支持Promise API<br>拦截请求和响应<br>转换请求和响应数据<br>取消请求<br>JSON数据的自动转换<br>客户端支持以防止XSRF</p>
+</blockquote>
+<h2 id="axios源码阅读"><a href="#axios源码阅读" class="headerlink" title="axios源码阅读"></a>axios源码阅读</h2><p>接下来我们结合源码，来具体看一下 axios 内部是如何实现的（不过这里小小吐槽一下 axios 还是在用 grunt 打包的～😳哈哈 ）</p>
+<h4 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h4><p>首先看一下 axios 项目的目录结构：</p>
+<pre class=" language-js"><code class="language-js">├── <span class="token operator">/</span>dist<span class="token operator">/</span>                     # 源码打包输出目录
+├── <span class="token operator">/</span>lib<span class="token operator">/</span>                      # 项目源码目录
+│ ├── <span class="token operator">/</span>adapters<span class="token operator">/</span>               # 定义请求的适配器 xhr、http
+│ │ ├── http<span class="token punctuation">.</span>js                # node端请求封装
+│ │ └── xhr<span class="token punctuation">.</span>js                 # 客户端 XMLHttpRequest 的封装
+│ ├── <span class="token operator">/</span>cancel<span class="token operator">/</span>                 # 取消requests功能
+│ ├── <span class="token operator">/</span>core<span class="token operator">/</span>                   # 一些核心功能
+│ │ ├── Axios<span class="token punctuation">.</span>js               # axios实例构造函数
+│ │ ├── InterceptorManager<span class="token punctuation">.</span>js  # 拦截器构造函数
+│ │ ├── createError<span class="token punctuation">.</span>js         # 抛出错误
+│ │ ├── dispatchRequest<span class="token punctuation">.</span>js     # 用来调用http请求适配器方法发送请求
+│ │ ├── mergeConfig<span class="token punctuation">.</span>js         # 合并参数
+│ │ ├── settle<span class="token punctuation">.</span>js              # 根据http响应状态，改变Promise的状态
+│ │ └── transformData<span class="token punctuation">.</span>js       # 改变数据格式
+│ ├── <span class="token operator">/</span>helpers<span class="token operator">/</span>                # 一些辅助方法
+│ ├── axios<span class="token punctuation">.</span>js                 # 对外暴露接口
+│ ├── defaults<span class="token punctuation">.</span>js              # 默认配置
+│ └── utils<span class="token punctuation">.</span>js                 # 公用方法文件 判断各种类型和常用方法的封装
+├── index<span class="token punctuation">.</span>d<span class="token punctuation">.</span>ts                 # 配置TypeScript的声明文件
+├── <span class="token keyword">package</span><span class="token punctuation">.</span>json               # 项目信息
+└── index<span class="token punctuation">.</span>js                   # 入口文件
+</code></pre>
+<h4 id="API-使用"><a href="#API-使用" class="headerlink" title="API 使用"></a>API 使用</h4><table>
+<thead>
+<tr>
+<th>API</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>axios(config)</td>
+<td>将相关配置传递给 axios 来发出请求</td>
+</tr>
+<tr>
+<td>axios.create(config)</td>
+<td>创建 Axios 实例设置默认参数，继承原型方法</td>
+</tr>
+<tr>
+<td>axios.request(get, post, put, options …)</td>
+<td>请求方法别名, 支持各种http请求方法</td>
+</tr>
+<tr>
+<td>axios.all(iterable) / axios.spread(callback)</td>
+<td>处理并发请求</td>
+</tr>
+<tr>
+<td>axios.Cancel / axios.CancelToken / axios.isCancel</td>
+<td>请求取消</td>
+</tr>
+<tr>
+<td>transformRequest / transformResponse</td>
+<td>转换请求与响应数据</td>
+</tr>
+<tr>
+<td>axios.interceptors</td>
+<td>定义请求或响应的拦截器</td>
+</tr>
+</tbody>
+</table>
+<h4 id="工具方法使用"><a href="#工具方法使用" class="headerlink" title="工具方法使用"></a>工具方法使用</h4><p>axios 中定义了一些常用的方法，并在项目中多处使用，简单可以看一下<br>1、utils.extend<br>将一个对象的方法和属性扩展到另外一个对象上，并指定上下文，例如：utils.extend(target, source, context)，会将 source 对象下的方法和属性扩展到 target 上，并把 this 指向到 context 上面。</p>
+<p>2、utils.forEach<br>既可以遍历对象也可以遍历数组，对原生的 forEach 方法做了扩展。</p>
+<blockquote>
+<p>遍历数组 utils.forEach([], (value, index, array) =&gt; {})<br>遍历对象 utils.forEach({}, (value, key, object) =&gt; {})</p>
+</blockquote>
+<p>3、bind<br>给某个函数指定上下文，也就是this指向。bind(fn, context); 实现效果同Function.prototype.bind方法: fn.bind(context)</p>
+<p>4、merge<br>深度合并多个对象为一个对象</p>
+<hr>
+<h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><p>首先从入口文件入手，在 index.js 中引入了 <code>&#39;./lib/axios&#39;</code>，在 <a href="https://github.com/axios/axios/blob/master/lib/axios.js" target="_blank" rel="noopener">axios.js</a> 文件中创建了 axios 实例继承 Axios 类，同时在实例下定义一些常用方法，例如： create、all、cancel、spread，最后将实例 axios 导出暴漏给外部使用，如下我看一下具体源码实现。</p>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// lib/axios.js</span>
+<span class="token keyword">var</span> utils <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./utils'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> bind <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./helpers/bind'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> Axios <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./core/Axios'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> mergeConfig <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./core/mergeConfig'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> defaults <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./defaults'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 通过 createInstance 的方法，返回Axios实例</span>
+<span class="token keyword">function</span> <span class="token function">createInstance</span><span class="token punctuation">(</span>defaultConfig<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// new Axios 得到一个 Axios 实例，将默认配置传入构造函数中</span>
+    <span class="token keyword">var</span> context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Axios</span><span class="token punctuation">(</span>defaultConfig<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// instance 实例为bind返回的一个函数(即是request发送请求方法)，此时 this 绑定到 context 上下文环境</span>
+    <span class="token keyword">var</span> instance <span class="token operator">=</span> <span class="token function">bind</span><span class="token punctuation">(</span>Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>request<span class="token punctuation">,</span> context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 将Axios.prototype复制到实例</span>
+    utils<span class="token punctuation">.</span><span class="token function">extend</span><span class="token punctuation">(</span>instance<span class="token punctuation">,</span> Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">,</span> context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 将上下文复制到新的axios实例上</span>
+    utils<span class="token punctuation">.</span><span class="token function">extend</span><span class="token punctuation">(</span>instance<span class="token punctuation">,</span> context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> instance<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// 创建默认的实例并导出 axios</span>
+<span class="token keyword">var</span> axios <span class="token operator">=</span> <span class="token function">createInstance</span><span class="token punctuation">(</span>defaults<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 暴漏出 Axios 类以允许类继承</span>
+axios<span class="token punctuation">.</span>Axios <span class="token operator">=</span> Axios<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 创建工厂方法, 对 createInstance 进行封装，返回一个新的 Axios 实例，接收配置 config 对象与默认配置进行合并。</span>
+axios<span class="token punctuation">.</span>create <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">create</span><span class="token punctuation">(</span>instanceConfig<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">createInstance</span><span class="token punctuation">(</span><span class="token function">mergeConfig</span><span class="token punctuation">(</span>axios<span class="token punctuation">.</span>defaults<span class="token punctuation">,</span> instanceConfig<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+
+<span class="token comment" spellcheck="true">// 绑定取消请求的相关方法</span>
+axios<span class="token punctuation">.</span>Cancel <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./cancel/Cancel'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+axios<span class="token punctuation">.</span>CancelToken <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./cancel/CancelToken'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+axios<span class="token punctuation">.</span>isCancel <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./cancel/isCancel'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// all 方法，其实就是对 Promise.all 的封装，接收一个 promises 数组</span>
+axios<span class="token punctuation">.</span>all <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">all</span><span class="token punctuation">(</span>promises<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> Promise<span class="token punctuation">.</span><span class="token function">all</span><span class="token punctuation">(</span>promises<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+axios<span class="token punctuation">.</span>spread <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./helpers/spread'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> axios<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 允许在TypeScript中使用默认的导入语法</span>
+module<span class="token punctuation">.</span>exports<span class="token punctuation">.</span><span class="token keyword">default</span> <span class="token operator">=</span> axios<span class="token punctuation">;</span>
+</code></pre>
+<p>通过以上代码，我们可以知道 axios 入口其实就是通过 createInstance 创建出来的实例，与 axios.create() 创建出的实例相同，createInstance 流程大致为:<br>1、创建一个 Axios 的实例 context, 并将默认参数 defaultConfig 传入<br>2、根据 Axios.prototype.request 和 上下文 创建实例 instance，实例为一个 request 发送请求的函数 this 指向上下文 context<br>3、将原型上 Axios.prototype 的其他方法，绑定到 instance 实例，并将 this 指到上下文 context 上<br>4、把 context 中的默认配置 defaults 和拦截器 interceptors 绑定到 instance 实例上</p>
+<p><strong>Axios 构造函数</strong><br>Axios 构造函数其实就是 axios 整个包的核心，其他方法都是对Axios内容的扩展，在<a href="https://github.com/axios/axios/blob/master/lib/core/Axios.js" target="_blank" rel="noopener">lib/core/Axios.js</a>文件中定义了 Axios 构造函数，同时也定义了 interceptors 拦截器、request 原型方法和各种请求的别名。</p>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// lib/core/Axios.js</span>
+<span class="token keyword">var</span> utils <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./../utils'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> buildURL <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'../helpers/buildURL'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> InterceptorManager <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./InterceptorManager'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> dispatchRequest <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./dispatchRequest'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> mergeConfig <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./mergeConfig'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">Axios</span><span class="token punctuation">(</span>instanceConfig<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>defaults <span class="token operator">=</span> instanceConfig<span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>interceptors <span class="token operator">=</span> <span class="token punctuation">{</span>
+        request<span class="token punctuation">:</span> <span class="token keyword">new</span> <span class="token class-name">InterceptorManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        response<span class="token punctuation">:</span> <span class="token keyword">new</span> <span class="token class-name">InterceptorManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>request <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">request</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// ...</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// Provide aliases for supported request methods</span>
+utils<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'delete'</span><span class="token punctuation">,</span> <span class="token string">'get'</span><span class="token punctuation">,</span> <span class="token string">'head'</span><span class="token punctuation">,</span> <span class="token string">'options'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token function">forEachMethodNoData</span><span class="token punctuation">(</span>method<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">[</span>method<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">request</span><span class="token punctuation">(</span>utils<span class="token punctuation">.</span><span class="token function">merge</span><span class="token punctuation">(</span>config <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            method<span class="token punctuation">:</span> method<span class="token punctuation">,</span>
+            url<span class="token punctuation">:</span> url
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+utils<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'post'</span><span class="token punctuation">,</span> <span class="token string">'put'</span><span class="token punctuation">,</span> <span class="token string">'patch'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token function">forEachMethodWithData</span><span class="token punctuation">(</span>method<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">[</span>method<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">,</span> config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">request</span><span class="token punctuation">(</span>utils<span class="token punctuation">.</span><span class="token function">merge</span><span class="token punctuation">(</span>config <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            method<span class="token punctuation">:</span> method<span class="token punctuation">,</span>
+            url<span class="token punctuation">:</span> url<span class="token punctuation">,</span>
+            data<span class="token punctuation">:</span> data
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>我们注意到这里调用了 forEach 方法，主要是将请求别名挂载到 Axios 原型上，这样我们通过 axios.get()、axios.post() 的方式来调用，其实最终都是掉用的 this.request 方法，两次 forEach 是因为 post 、 put 、 patch 含有请求体，所以分开处理。</p>
+<p><strong>拦截器</strong><br>在 Axios 构造函数中，我们注意到有一个 interceptors 属性，这个属性下含有 request 和 response 两对象都分别继承了 InterceptorManager 构造函数，这个构造函数主要，定义了操作拦截器数组添加、移除的方法</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">InterceptorManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handlers <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 添加新的拦截器到堆栈中，返回当前项的索引值</span>
+InterceptorManager<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>use <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">use</span><span class="token punctuation">(</span>fulfilled<span class="token punctuation">,</span> rejected<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>handlers<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        fulfilled<span class="token punctuation">:</span> fulfilled<span class="token punctuation">,</span>
+        rejected<span class="token punctuation">:</span> rejected
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>handlers<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 从堆栈中删除拦截器</span>
+InterceptorManager<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>eject <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">eject</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>handlers<span class="token punctuation">[</span>id<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>handlers<span class="token punctuation">[</span>id<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 遍历this.handlers，并将this.handlers里的每一项作为参数传给fn执行</span>
+InterceptorManager<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>forEach <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">forEach</span><span class="token punctuation">(</span>fn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    utils<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>handlers<span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token function">forEachHandler</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>h <span class="token operator">!==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">fn</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>InterceptorManager 构造函数来实现拦截器，这个构造函数原型上有3个方法：use、eject、forEach，操作该构造函数中的 handlers 实例属性，当我们成功添加拦截器之后，我们需要在请求的前后对数据进行处理，这也就是在 Axios.protoType.request 中做了相关的处理。</p>
+<p><strong>Axios.protoType.request</strong><br>在 Axios 原型上定义了最核心的方法 request，axios 中请求最终是由 request 方法发出的。</p>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">/**
+ * Dispatch a request
+*/</span>
+Axios<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>request <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token function">request</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> chain <span class="token operator">=</span> <span class="token punctuation">[</span>dispatchRequest<span class="token punctuation">,</span> undefined<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> promise<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>支持客户端XSRF攻击防护<br>XSRF攻击，即“跨站请求伪造”(Cross Site Request Forgery)攻击。通过窃取用户cookie，让用户在本机（即拥有身份 cookie 的浏览器端）发起用户所不知道的请求。防护XSRF攻击的一种方法是设置特殊的xsrf token，axios实现了对这种方法的支持：<br>在默认配置文件中设置</p>
+<pre class=" language-js"><code class="language-js"><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// `xsrfCookieName` is the name of the cookie to use as a value for xsrf token</span>
+  xsrfCookieName<span class="token punctuation">:</span> <span class="token string">'XSRF-TOKEN'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// default</span>
+
+  <span class="token comment" spellcheck="true">// `xsrfHeaderName` is the name of the http header that carries the xsrf token value</span>
+  xsrfHeaderName<span class="token punctuation">:</span> <span class="token string">'X-XSRF-TOKEN'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// default</span>
+<span class="token punctuation">}</span>
+</code></pre>
+
+            </div>
+
+            <!-- Post Comments -->
+            
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 40px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #7EC0EE;
+            text-shadow: 0
+        }
+</style>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2019/03/20/Axios/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://yoursite.com/2019/03/20/Axios/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/javascript">
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document;
+        var s = d.createElement('script');
+        s.src = '//yyhappynice.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', + new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+</div>
+<style>
+    #disqus-comment{
+        background-color: #fff;
+        padding: 2pc;
+    }
+</style>
+
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+                <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>

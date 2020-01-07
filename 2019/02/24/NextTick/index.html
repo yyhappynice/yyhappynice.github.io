@@ -1,0 +1,439 @@
+<!DOCTYPE HTML>
+<html>
+
+<head><meta name="generator" content="Hexo 3.8.0">
+	<link rel="bookmark" type="image/x-icon" href="/img/logo.png">
+	<link rel="shortcut icon" href="/img/logo.png">
+	
+			    <title>
+    YuYiのblog
+    </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/css/mic_main.css">
+    <link rel="stylesheet" href="/css/dropdownMenu.css">
+    <meta name="keywords" content="web,node">
+    
+    	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	 
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css">
+    </noscript>
+    <div class="back"></div>
+    <style type="text/css">
+        .back {
+          position: fixed;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-position: center 0;
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+    </style>
+    <script>
+      let url = `/img/${Math.floor((new Date().getMinutes() + 1) / 2)}.jpg`
+      var back = document.querySelector('.back')
+      back.style.backgroundImage = `url(${url})`
+    </script>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+
+	
+</head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_default.css">
+<link rel="stylesheet" href="/css/typo.css">
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">MICCALL</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special">
+            <ul class="menu links">
+			<!-- Homepage  主页  --> 
+			<li>
+	            <a href="/" rel="nofollow">主页</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/about/" title="简历">
+		                简历
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="标签">
+		                标签
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+                    
+                    <li>
+                        <a title="Twitter" href="https://twitter.com/yyhappynice" target="_blank" rel="noopener">
+                            <i class="icon fa fa-Twitter"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="github" href="https://github.com/yyhappynice" target="_blank" rel="noopener">
+                            <i class="icon fa fa-github"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="500px" href="http://500px.com" target="_blank" rel="noopener">
+                            <i class="icon fa fa-500px"></i>
+                        </a>
+                    </li>
+                    
+			</ul>
+</nav>
+
+        <div id="main">
+            <div class="post_page_title_img" style="height: 25rem;background-image: url(https://user-images.githubusercontent.com/12566627/66709322-0832cb00-ed94-11e9-90c5-b61989f1baff.jpg);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;">
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2>nextTick</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <p>在 Vue 中，是<a href="https://cn.vuejs.org/v2/guide/reactivity.html#%E5%BC%82%E6%AD%A5%E6%9B%B4%E6%96%B0%E9%98%9F%E5%88%97" target="_blank" rel="noopener">异步执行 DOM 更新的</a>，当观察到数据变化，Vue 将开启一个队列，并缓冲在同一事件循环中发生的所有数据改变。如果同一个 watcher 被多次触发，只会被推入到队列中一次。这种在缓冲时去除重复数据可以避免不必要的计算和 DOM 的重复渲染；在vue开发中我们也常常会使用到 nextTick，让我们来一探究竟吧～😊</p>
+<h2 id="vue-nextTick机制"><a href="#vue-nextTick机制" class="headerlink" title="vue nextTick机制"></a>vue nextTick机制</h2><h3 id="事件循环（Event-Loop）"><a href="#事件循环（Event-Loop）" class="headerlink" title="事件循环（Event Loop）"></a>事件循环（Event Loop）</h3><p>在了解原理之前我们先看下 js 的事件循环 <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loops" target="_blank" rel="noopener">Event Loop</a>：</p>
+<p>JS中有两种任务类型：微任务（microtask）和宏任务（macrotask），在ES6中，microtask称为 jobs，macrotask称为 task。</p>
+<p><strong>宏任务</strong>： <code>script</code> （整体代码）、<code>setTimeout</code> 、<code>setInterval</code> 、<code>setImmediate</code> 、<code>I/O</code> 、<code>UI rendering</code></p>
+<p><strong>微任务</strong>：<code>process.nextTick</code>（Nodejs） 、<code>promise</code> 、<code>Object.observe</code> 、<code>MutationObserver</code></p>
+<p>一次事件循环的步骤包括：<br>1、从macrotask queue中取出最早的任务（通常是script整体代码）执行，microtask 压入到microtask queue中，macrotask 压入到macrotask queue中<br>2、从macrotask queue中删除执行过的macrotask<br>3、检查是否存在 Microtask，如果存在则不停的执行，直至清空 microtask 队列<br>4、更新render(每一次事件循环，浏览器都可能会去更新渲染)<br>5、重复以上步骤</p>
+<p><img src="https://user-images.githubusercontent.com/12566627/66882038-7f1dcd00-effb-11e9-8197-50808c4116d2.png" alt="event-loop"></p>
+<p>用一段代码表示事件循环如下：</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">for</span> <span class="token punctuation">(</span>macroTask <span class="token keyword">of</span> macroTaskQueue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 1. Handle current MACRO-TASK</span>
+    <span class="token function">handleMacroTask</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 2. Handle all MICRO-TASK</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>microTask <span class="token keyword">of</span> microTaskQueue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">handleMicroTask</span><span class="token punctuation">(</span>microTask<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<hr>
+<h3 id="Vue-nextTick-的实现（2-6）"><a href="#Vue-nextTick-的实现（2-6）" class="headerlink" title="Vue nextTick 的实现（2.6）"></a>Vue nextTick 的实现<a href="https://github.com/vuejs/vue/blob/dev/src/core/util/next-tick.js" target="_blank" rel="noopener">（2.6）</a></h3><p>nextTick的实现，主要是要想在 microTask 列队中增加 function，在当前栈执行完成后执行 nextTick 传入的 funtion，源码如下：</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">import</span> <span class="token punctuation">{</span> noop <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'shared/util'</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> handleError <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./error'</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> isIE<span class="token punctuation">,</span> isIOS<span class="token punctuation">,</span> isNative <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./env'</span>
+
+<span class="token keyword">const</span> callbacks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">let</span> pending <span class="token operator">=</span> <span class="token boolean">false</span> <span class="token comment" spellcheck="true">// 标记位，如果已经有 timerFunc 被推送到任务队列中去则不需要重复推送</span>
+
+<span class="token keyword">function</span> flushCallbacks <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    pending <span class="token operator">=</span> <span class="token boolean">false</span> <span class="token comment" spellcheck="true">//重置 pending 状态</span>
+    <span class="token keyword">const</span> copies <span class="token operator">=</span> callbacks<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//浅拷贝 callbacks 数组</span>
+    callbacks<span class="token punctuation">.</span>length <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> copies<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        copies<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 在2.5版本中组合使用microtasks 和macrotasks，但是重绘的时候还是存在一些小问题，</span>
+<span class="token comment" spellcheck="true">// 而且使用macrotasks在任务队列中会有几个特别奇怪的行为没办法避免，So在任何地方优先使用microtasks 。</span>
+<span class="token comment" spellcheck="true">// Here we have async deferring wrappers using microtasks.</span>
+<span class="token comment" spellcheck="true">// In 2.5 we used (macro) tasks (in combination with microtasks).</span>
+<span class="token comment" spellcheck="true">// However, it has subtle problems when state is changed right before repaint</span>
+<span class="token comment" spellcheck="true">// (e.g. #6813, out-in transitions).</span>
+<span class="token comment" spellcheck="true">// Also, using (macro) tasks in event handler would cause some weird behaviors</span>
+<span class="token comment" spellcheck="true">// that cannot be circumvented (e.g. #7109, #7153, #7546, #7834, #8109).</span>
+<span class="token comment" spellcheck="true">// So we now use microtasks everywhere, again.</span>
+<span class="token comment" spellcheck="true">// A major drawback of this tradeoff is that there are some scenarios</span>
+<span class="token comment" spellcheck="true">// where microtasks have too high a priority and fire in between supposedly</span>
+<span class="token comment" spellcheck="true">// sequential events (e.g. #4521, #6690, which have workarounds)</span>
+<span class="token comment" spellcheck="true">// or even between bubbling of the same event (#6566).</span>
+<span class="token keyword">let</span> timerFunc
+
+<span class="token comment" spellcheck="true">// The nextTick behavior leverages the microtask queue, which can be accessed</span>
+<span class="token comment" spellcheck="true">// via either native Promise.then or MutationObserver.</span>
+<span class="token comment" spellcheck="true">// MutationObserver has wider support, however it is seriously bugged in</span>
+<span class="token comment" spellcheck="true">// UIWebView in iOS >= 9.3.3 when triggered in touch event handlers. It</span>
+<span class="token comment" spellcheck="true">// completely stops working after triggering a few times... so, if native</span>
+<span class="token comment" spellcheck="true">// Promise is available, we will use it:</span>
+<span class="token comment" spellcheck="true">/* istanbul ignore next, $flow-disable-line */</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> Promise <span class="token operator">!==</span> <span class="token string">'undefined'</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isNative</span><span class="token punctuation">(</span>Promise<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">//如果原生支持 则使用 Promise</span>
+    <span class="token keyword">const</span> p <span class="token operator">=</span> Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    timerFunc <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        p<span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>flushCallbacks<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// In problematic UIWebViews, Promise.then doesn't completely break, but</span>
+        <span class="token comment" spellcheck="true">// it can get stuck in a weird state where callbacks are pushed into the</span>
+        <span class="token comment" spellcheck="true">// microtask queue but the queue isn't being flushed, until the browser</span>
+        <span class="token comment" spellcheck="true">// needs to do some other work, e.g. handle a timer. Therefore we can</span>
+        <span class="token comment" spellcheck="true">// "force" the microtask queue to be flushed by adding an empty timer.</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>isIOS<span class="token punctuation">)</span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>noop<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//在ios下添加空的计时器，来刷新 microtask 列队</span>
+     <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isIE <span class="token operator">&amp;&amp;</span> <span class="token keyword">typeof</span> MutationObserver <span class="token operator">!==</span> <span class="token string">'undefined'</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>
+    <span class="token function">isNative</span><span class="token punctuation">(</span>MutationObserver<span class="token punctuation">)</span> <span class="token operator">||</span>
+    <span class="token comment" spellcheck="true">// PhantomJS and iOS 7.x</span>
+    MutationObserver<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token string">'[object MutationObserverConstructor]'</span>
+<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Use MutationObserver where native Promise is not available,</span>
+    <span class="token comment" spellcheck="true">// e.g. PhantomJS, iOS7, Android 4.4</span>
+    <span class="token comment" spellcheck="true">// (#6466 MutationObserver is unreliable in IE11)</span>
+    <span class="token keyword">let</span> counter <span class="token operator">=</span> <span class="token number">1</span>
+    <span class="token keyword">const</span> observer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MutationObserver</span><span class="token punctuation">(</span>flushCallbacks<span class="token punctuation">)</span>
+    <span class="token keyword">const</span> textNode <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createTextNode</span><span class="token punctuation">(</span><span class="token function">String</span><span class="token punctuation">(</span>counter<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    observer<span class="token punctuation">.</span><span class="token function">observe</span><span class="token punctuation">(</span>textNode<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        characterData<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    timerFunc <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        counter <span class="token operator">=</span> <span class="token punctuation">(</span>counter <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">2</span>
+        textNode<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">String</span><span class="token punctuation">(</span>counter<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> setImmediate <span class="token operator">!==</span> <span class="token string">'undefined'</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isNative</span><span class="token punctuation">(</span>setImmediate<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Fallback to setImmediate.</span>
+    <span class="token comment" spellcheck="true">// Technically it leverages the (macro) task queue,</span>
+    <span class="token comment" spellcheck="true">// but it is still a better choice than setTimeout.</span>
+    timerFunc <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 如果不支持Promise/MutationObserver，则使用setImmediate(macrotask)兼容，比setTimeout更好</span>
+        <span class="token comment" spellcheck="true">// setImmediate 可以保证让代码在下一次事件循环执行[参考](https://www.cnblogs.com/onepixel/articles/7605465.html)</span>
+        <span class="token function">setImmediate</span><span class="token punctuation">(</span>flushCallbacks<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Fallback to setTimeout.</span>
+    timerFunc <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token function">setTimeout</span><span class="token punctuation">(</span>flushCallbacks<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> nextTick <span class="token punctuation">(</span>cb<span class="token operator">?</span><span class="token punctuation">:</span> Function<span class="token punctuation">,</span> ctx<span class="token operator">?</span><span class="token punctuation">:</span> Object<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">//cb 回掉函数，ctx执行上下文</span>
+    <span class="token keyword">let</span> _resolve
+    callbacks<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// 收集所有的回调函数</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>cb<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                cb<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">handleError</span><span class="token punctuation">(</span>e<span class="token punctuation">,</span> ctx<span class="token punctuation">,</span> <span class="token string">'nextTick'</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>_resolve<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">_resolve</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>pending<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        pending <span class="token operator">=</span> <span class="token boolean">true</span>
+        <span class="token function">timerFunc</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 创建microtask，异步执行flushCallbacks函数</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// 当 nextTick 没有传入函数参数的时候，返回一个 Promise 调用</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cb <span class="token operator">&amp;&amp;</span> <span class="token keyword">typeof</span> Promise <span class="token operator">!==</span> <span class="token string">'undefined'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span>resolve <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+            _resolve <span class="token operator">=</span> resolve
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>总结：源码看下来首先将所有的回调收集到 callbacks 数组中，调用 timerFunc() 函数(优先使用 Promise &gt; MutationObserver &gt; setImmediate &gt; setTimeout 来创建异步任务) 创建异步任务延迟调用 flushCallbacks，来遍历执行 callbacks 数组中的所有函数。</p>
+<hr>
+<h3 id="Watcher队列"><a href="#Watcher队列" class="headerlink" title="Watcher队列"></a>Watcher队列</h3><p>在了解 nextTick 之后，我们看下 dom 为什么是异步更新的，当我们更改 this.message 值的时候，直接打印 textContent 值dom其实是没有更新的，在 this.$nextTick 中打印，dom才更新完成</p>
+<pre class=" language-js"><code class="language-js">Vue<span class="token punctuation">.</span><span class="token function">component</span><span class="token punctuation">(</span><span class="token string">'example'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    template<span class="token punctuation">:</span> <span class="token string">'&lt;span>{{ message }}&lt;/span>'</span><span class="token punctuation">,</span>
+    data<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        message<span class="token punctuation">:</span> <span class="token string">'没有更新'</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    methods<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        updateMessage<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>message <span class="token operator">=</span> <span class="token string">'更新完成'</span>
+            console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>$el<span class="token punctuation">.</span>textContent<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// => '没有更新'</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$nextTick</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>$el<span class="token punctuation">.</span>textContent<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// => '更新完成'</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>简单分析一下 <code>this.message = &#39;更新完成&#39;</code> 赋值操作后，vue 派发更新的过程 如下：<br>首先 vue 在响应式数据依赖收集过程中，使用 Object.defineProperty 在 get 的时候使用 <a href="https://github.com/vuejs/vue/blob/dev/src/core/observer/index.js#L163" target="_blank" rel="noopener">dep.depend()</a> 做依赖收集，当触发 set 操作的时候，会调用 <a href="https://github.com/vuejs/vue/blob/dev/src/core/observer/index.js#L191" target="_blank" rel="noopener">dep.notify()</a> 方法通知所有的订阅者。</p>
+<p>下面我们看一下 Dep 构造函数，定义在 <a href="https://github.com/vuejs/vue/blob/dev/src/core/observer/dep.js" target="_blank" rel="noopener">src/core/observer/dep.js</a> 中：</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Dep</span> <span class="token punctuation">{</span>
+    <span class="token keyword">static</span> target<span class="token punctuation">:</span> <span class="token operator">?</span> Watcher
+    <span class="token comment" spellcheck="true">//...</span>
+    addSub <span class="token punctuation">(</span>sub<span class="token punctuation">:</span> Watcher<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>subs<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>sub<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//将 Watcher 添加到 this.subs 数组中</span>
+    <span class="token punctuation">}</span>
+
+    depend <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Dep<span class="token punctuation">.</span>target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Dep<span class="token punctuation">.</span>target<span class="token punctuation">.</span><span class="token function">addDep</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    notify <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// stabilize the subscriber list first</span>
+        <span class="token keyword">const</span> subs <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>subs<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> l <span class="token operator">=</span> subs<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> l<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            subs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+Dep<span class="token punctuation">.</span>target <span class="token operator">=</span> <span class="token keyword">null</span>
+<span class="token keyword">const</span> targetStack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> pushTarget <span class="token punctuation">(</span>target<span class="token punctuation">:</span> <span class="token operator">?</span>Watcher<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    targetStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span>
+    Dep<span class="token punctuation">.</span>target <span class="token operator">=</span> target
+<span class="token punctuation">}</span>
+</code></pre>
+<p>首先，我们注意到 Dep 下有个 target 静态属性 类型是 Watcher，当调用 dep.depend() 的时候会调用 Watcher 下的 addDep(this); dep.notify 函数很简单中主要是遍历所有的 subs，也就是 Watcher 的实例数组，并调用 update() 方法，下面我们看一下 Watcher 构造函数中，这两个函数的实现：</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Watcher</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//...</span>
+    <span class="token keyword">get</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">pushTarget</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 当在 new Watcher 时候会触发，将 this 挂载到 Dep.target 上</span>
+        <span class="token comment" spellcheck="true">//...</span>
+    <span class="token punctuation">}</span>
+
+    addDep <span class="token punctuation">(</span>dep<span class="token punctuation">:</span> Dep<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//...</span>
+        dep<span class="token punctuation">.</span><span class="token function">addSub</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 调用 dep 下的 addSub</span>
+    <span class="token punctuation">}</span>
+    update <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         <span class="token comment" spellcheck="true">/* istanbul ignore else */</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>dirty <span class="token operator">=</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>sync<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">queueWatcher</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>在 Watcher 构造函数中的 addDep 调用 dep.addSub(this) 将当前的 Watcher 实例push到 dep 下 this.subs 数组中，在遍历数组调用 update 最终执行 queueWatcher(this) 方法。<br><strong>注意：</strong> 在 queueWatcher 函数中，执行了 <a href="https://github.com/vuejs/vue/blob/dev/src/core/observer/scheduler.js#L187" target="_blank" rel="noopener">nextTick(flushSchedulerQueue)</a>，同样使用 nextTick 将 flushSchedulerQueue 这个任务放到异步列队中。这个函数中调用了 <a href="https://github.com/vuejs/vue/blob/dev/src/core/observer/scheduler.js#L95" target="_blank" rel="noopener">watcher.run()</a> （watcher.run() 中 调用 this.getAndInvoke 新老的 value 对比）来的更新视图。正是这里使用了 nextTick 来更新 dom， 所以我们想获取 dom 更新后的值，需要在 this.$nextTick 回调中才可以拿到。</p>
+<p>关于为什么 vue 视图更新是异步的 和 nextTick 实现原理今天就介绍到这啦～ 😊</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://lynnelv.github.io/js-event-loop-browser" target="_blank" rel="noopener">js事件循环机制</a><br><a href="https://juejin.im/post/5cd9854b5188252035420a13" target="_blank" rel="noopener">你真的理解$nextTick么</a><br><a href="https://ustbhuangyi.github.io/vue-analysis/reactive/setters.html#%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90" target="_blank" rel="noopener">Vue.js 技术揭秘</a><br><a href="https://juejin.im/post/59c7b25a5188257a125d7a98" target="_blank" rel="noopener">从Vue.js源码看异步更新DOM策略及nextTick</a></p>
+
+            </div>
+
+            <!-- Post Comments -->
+            
+    <!-- 使用 DISQUS_CLICK -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+
+<!-- add animation -->
+<style>
+	.disqus_click_btn {
+            line-height: 40px;
+            margin: 0;
+            min-width: 50px;
+            padding: 0 14px;
+            display: inline-block;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), color .2s cubic-bezier(.4, 0, .2, 1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            border: 0;
+            background: rgba(158, 158, 158, .2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            color: #fff;
+            background-color: #7EC0EE;
+            text-shadow: 0
+        }
+</style>
+
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2019/02/24/NextTick/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://yoursite.com/2019/02/24/NextTick/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+
+<script type="text/javascript">
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document;
+        var s = d.createElement('script');
+        s.src = '//yyhappynice.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', + new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+</div>
+<style>
+    #disqus-comment{
+        background-color: #fff;
+        padding: 2pc;
+    }
+</style>
+
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+                <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>
