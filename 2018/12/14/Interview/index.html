@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="/css/dropdownMenu.css">
     <meta name="keywords" content="web,node">
     
-    	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-	 
     <noscript>
         <link rel="stylesheet" href="/css/noscript.css">
     </noscript>
@@ -153,7 +151,7 @@
 <h2 id="前端面试题汇总"><a href="#前端面试题汇总" class="headerlink" title="前端面试题汇总"></a>前端面试题汇总</h2><h3 id="js-相关"><a href="#js-相关" class="headerlink" title="js 相关"></a>js 相关</h3><p><strong><code>[&#39;1&#39;, &#39;2&#39;, &#39;3&#39;].map(parseInt)</code></strong></p>
 <p>2、call实现</p>
 <pre class=" language-js"><code class="language-js">Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>call <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  context <span class="token operator">=</span> context <span class="token operator">?</span> <span class="token function">Object</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span> <span class="token punctuation">:</span> window<span class="token punctuation">;</span>
+  context <span class="token operator">=</span> context <span class="token operator">||</span> window<span class="token punctuation">;</span>
   <span class="token keyword">var</span> fn <span class="token operator">=</span> <span class="token function">Symbol</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// added</span>
   context<span class="token punctuation">[</span>fn<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// changed</span>
 
@@ -344,7 +342,7 @@ Array<span class="token punctuation">.</span><span class="token keyword">from</s
                 <li>Design: <a href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
             </ul>
             
-                <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+				<span id="busuanzi_container_site_pv"> 2020 </span> 
 			
         </div>
     </div>
