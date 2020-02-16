@@ -6,6 +6,6 @@
             <% if(theme.busuanzi.enable === true ) { %>
                 <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
 			<% } else { %>
-				<span id="busuanzi_container_site_pv"> <%- date(Date.now(), 'YYYY') %> </span> 
+				<span id="busuanzi_container_site_pv"> <%- date(Date.now(), 'YYYY-MM-DD') %> </span>
 			<% } %>
         </div>
