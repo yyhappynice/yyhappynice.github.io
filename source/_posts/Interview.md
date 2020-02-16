@@ -16,7 +16,7 @@ __`['1', '2', '3'].map(parseInt)`__
 2、call实现
 ```js
 Function.prototype.call = function (context) {
-  context = context ? Object(context) : window;
+  context = context || window;
   var fn = Symbol(); // added
   context[fn] = this; // changed
 
