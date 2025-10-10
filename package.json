@@ -1,6 +1,8 @@
 {
-  "name": "hexo-site",
+  "name": "yuyi-blog",
   "version": "0.0.0",
+  "description": "YuYi's personal blog built with Hexo",
+  "private": true,
   "scripts": {
     "dev": "hexo s",
     "publish": "hexo g && hexo d"
