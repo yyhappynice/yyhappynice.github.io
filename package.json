@@ -7,7 +7,7 @@
     "publish": "hexo g && hexo d"
   },
   "hexo": {
-    "version": "3.8.0"
+    "version": "3.7.0"
   },
   "dependencies": {
     "hexo": "3.7.0",
