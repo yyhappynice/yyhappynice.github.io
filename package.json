@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "hexo s",
-    "deploy": "hexo g && hexo d"
+    "bd": "hexo g && hexo d"
   },
   "hexo": {
     "version": "3.7.0"
