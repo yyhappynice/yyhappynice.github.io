@@ -1,0 +1,24 @@
+
+<% if (theme.nav_blur_gradient) { %>
+<div class="nav-mask">
+  <div order="1"></div>
+  <div order="2"></div>
+  <div order="3"></div>
+  <div order="4"></div>
+  <div order="5"></div>
+  <div order="6"></div>
+</div>
+<% } %>
+<nav id="theme-nav">
+  <div class="inner">
+    <a class="title" href="<%= config.root %>"><%= theme.nav.title %></a>
+    <div class="nav-arrow"></div>
+    <div class="nav-items">
+      <a class="nav-item nav-item-home" href="<%= config.root %>" style="--index: 0"><%- __('home') %></a>
+
+      <% theme.nav.items.forEach((item, i) => { %>
+      <a class="nav-item<% if (item.is_icon) { %> is-icon<% } %>" href="<%= url_for(item.url) %>" style="--index: <%- i + 1 %>"><%- item.name %></a>
+      <% }) %>
+    </div>
+  </div>
+</nav>

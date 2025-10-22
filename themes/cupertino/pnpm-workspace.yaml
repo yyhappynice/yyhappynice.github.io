@@ -1,4 +1,3 @@
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - hexo-util
-packages:
-  - themes/cupertino

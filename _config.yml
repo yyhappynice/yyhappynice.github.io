@@ -96,6 +96,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
+# theme: cupertino
 theme: Chic
 
 # Deployment
