@@ -22,17 +22,37 @@
 
     function extend_click() {
         clearTimeout(tocbot_timer);
-        tocbot_timer = setTimeout(function() {
+        tocbot_timer = setTimeout(function () {
             tocbot.refresh(obj_merge(tocbot_default_config, {
                 hasInnerContainers: true
             }));
         }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
     }
 
-    document.ready(function() {
-        tocbot.init(obj_merge(tocbot_default_config, {
-            collapseDepth: 1
-        }));
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
     });
 
     function expand_toc() {
