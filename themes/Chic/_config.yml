@@ -12,10 +12,10 @@ nav:
 favicon: /favicon.ico
 
 # Profile
-nickname: Jeremy Bentham
+nickname: YuYi
 
 ### this variable is MarkDown form.
-description: Lorem ipsum dolor sit amet, **consectetur adipiscing elit.** <br>Fusce eget urna vitae velit *eleifend interdum at ac* nisi.
+description: 热爱技术的开发者，专注于 **AI/ML** 和 **Web开发** <br>分享技术心得，记录学习历程，*持续成长*
 avatar: /image/avatar.jpeg
 
 # main menu navigation
