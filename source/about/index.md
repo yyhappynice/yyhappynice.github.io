@@ -36,7 +36,7 @@ date: 2025-10-10 16:10:24
 ## 📬 联系方式
 
 - **GitHub**: [yyhappynice](https://github.com/yyhappynice)
-- **知乎**: [@sirice](https://www.zhihu.com/people/sirice)
+- **知乎**: [@yyhappynice](https://www.zhihu.com/people/fan-hua-piao-xue-40)
 - **邮箱**: your-email@example.com
 
 ---
