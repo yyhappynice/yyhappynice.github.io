@@ -37,7 +37,7 @@ date: 2025-10-10 16:10:24
 
 - **GitHub**: [yyhappynice](https://github.com/yyhappynice)
 - **知乎**: [@yyhappynice](https://www.zhihu.com/people/fan-hua-piao-xue-40)
-- **邮箱**: your-email@example.com
+- **邮箱**: yyhappynice@gmail.com
 
 ---
 *"Stay hungry, stay foolish." - Steve Jobs*
