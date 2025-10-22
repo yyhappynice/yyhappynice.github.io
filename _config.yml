@@ -13,7 +13,7 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://yyhappynice.github.io/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -54,6 +54,17 @@ prismjs:
   preprocess: true
   line_number: true
   tab_replace: ''
+
+# Kramed renderer configuration for TOC support
+kramed:
+  enable: true
+  render:
+    html: true
+    xhtmlOut: false
+    breaks: true
+    linkify: true
+    typographer: true
+    quotes: '""'''
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
