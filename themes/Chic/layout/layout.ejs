@@ -3,9 +3,28 @@
 
 <head>
     <%- partial('_partial/head',{cache: true}) %>
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
 </head>
 
 <body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
     <script>
         // this function is used to check current theme before page loaded.
         (() => {
@@ -24,6 +43,33 @@
             };
 
             setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `<%- config.root %>bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
         })();
     </script>
 
