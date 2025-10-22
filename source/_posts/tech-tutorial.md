@@ -1,5 +1,5 @@
 ---
-title: AI相关文章记录
+title: AI 相关文章记录
 date: 2025-10-12 15:30:00
 categories:
   - 技术教程
