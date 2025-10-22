@@ -42,3 +42,43 @@ $ hexo deploy
 ```
 
 More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
+
+
+---
+
+---
+
+<div style="text-align: center; color: red;">
+这是居中的红色文字
+</div>
+
+
+<details>
+<summary>点击展开</summary>
+这里是隐藏的内容
+</details>
+
+这是一个脚注[^1]
+
+[^1]: 这是脚注的内容
+
+{% blockquote %}
+这是一个引用块
+{% endblockquote %}
+
+{% codeblock lang:javascript %}
+function hello() {
+    console.log("Hello World!");
+}
+{% endcodeblock %}
+
+{% link 链接标题 https://example.com %}
+
+[TOC]  # 自动生成目录
+
+- [x] 已完成的任务
+- [ ] 未完成的任务
+- [ ] 另一个任务
+| 左对齐 | 居中对齐 | 右对齐 |
+|:-------|:-------:|-------:|
+| 内容1  |  内容2  |  内容3 |
