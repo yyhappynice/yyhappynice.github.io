@@ -17,6 +17,8 @@ tags:
 
 ## 结构化提示词工程
 
+---
+
 尽管 Context Engineering 是一个非常火的词，<u>但是如何写好 Prompt，依然是我们要入门的重点</u>。网上已经有非常多的提示词相关的内容， 但是从我的经验来看，我们可以把重点放在三个部分上：
 
 * **提示词输入与输出的结构化**
@@ -94,4 +96,121 @@ tags:
 4. **需求定稿**：确认最终需求，生成正式文档
 
 每个环节可以由不同的提示词或子 Agent 处理。例如，创意收集可借助具备搜索功能的 AI Agent，需求逻辑梳理可使用 Dify、 Copilot 365 等工具完成。最终，各环节按链式流程执行，同时保持模块化设计的灵活性，可根据需要随时调整或替换子任务。
+
+## 上下文工程与知识检索
+
+---
+通常来说，我们有 NoCode 和 ProCode 来支持带上下文的 Agent 开发。
+
+* **NoCode 方案（适合快速验证）**：用低代码平台（如 Dify、N8N、Coze 等）和预配置 RAG 管道，通过 UI 快速配置检索策略。
+* **ProCode 方案（适合定制化需求）**：用框架（LangChain、Spring AI）自定义检索流程和优化策略，能实现多阶段 HyDE + 混合检索 + 重排序管道。
+
+![context](https://github.com/user-attachments/assets/6bb350d2-bd80-4f5e-b7ed-a7b561a8ed51)
+
+<u>上下文本身也是提示词的一部分</u>，在没有实现各种自动化之前，我们通常会手动从文档中复制到 AI 聊天工具中。只是随着，我们进入了模型的深水区之后， 我们就需要开始思考自动化的构建方式，也就是用工程化的角度来思考这个问题。开始之前，我们依旧需要定义 AI Agents，这里我们可以引用 Anthropic 官方的 《Effective context engineering for AI agents》给的定义（因为它同样也有科学和艺术）：
+
+>上下文工程是一门将不断变化的信息宇宙中最相关内容，精心筛选并放入有限上下文窗口的艺术与科学。
+
+### 上下文窗口
+简单来说：关注在有限的上下文窗口中挑选最关键的信息，让模型理解和推理更高效。如下是 [Langchain 绘制](https://github.com/langchain-ai/how_to_fix_your_context)的 [Drew Breunig 的总结](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html) 的 6 种常见上下文工程技术：
+
+![上下文工程](https://github.com/user-attachments/assets/0a1d9a99-7c3a-4099-a591-395c41805f66)
+
+在这里，我会将其简述为：RAG 与上下文窗口的工程化。一个完整的上下文窗口的内容（即 prompts）通常应该包含：
+
+* **系统提示词部分：**
+  * <u>输入指令上下文</u>：告诉它“你是谁”“你要做什么”，包括系统提示、用户输入，还有角色定义。
+  * <u>格式化输出上下文</u>：指定模型输出格式的结构化模式，例如要求以 JSON 格式返回，以确保输出的可用性 。
+* **函数调用部分：**
+  * <u>工具相关上下文</u>：这赋予了模型与外部世界交互的能力。它包括可用工具或函数的定义，以及调用这些工具后返回的响应 。
+* **动态上下文部分：**
+  * <u>时间与记忆上下文</u>：短期记忆（Short-Term Memory）、长期记忆（Long-Term Memory）。
+  * <u>外部知识上下文</u>：从文档、数据库等外部信息库里查出来的事实，让模型少犯“胡说八道”的错误。
+  * <u>全局状态/暂存区</u>：模型处理复杂任务时的临时存储，相当于它的“工作记忆”。
+  * <u>外部知识</u>：通过检索增强生成（RAG）等技术，从外部知识库（如文档、数据库）中检索出的信息，用于为模型提供事实依据并减少幻觉 。
+
+除了固定的系统提示词部分，**外部知识的获取**与**记忆**会最大化影响整个窗口，因此对于它们俩的设计与优化便是上下文工程的重中之重。
+
+### 知识的检索增强生成
+
+![RAG](https://github.com/user-attachments/assets/acbb20c6-ed66-4cce-944e-285fda0a02e1)
+
+>RAG（检索增强生成，Retrieval-Augmented Generation）是构建 Agent 的核心技术之一，**它通过从外部知识库中检索相关信息来增强 大语言模型的生成能力**。在代码库问答等复杂场景中，单纯的向量检索往往不够精准，需要组合多种检索策略来提升准确率。
+
+简单来说，就是通过搜索来丰富上下文。根据实现复杂度和场景需求，我们可以将检索策略分为以下几类：
+
+* **关键词检索（Keyword Search）**。最基础的检索方式，适合精确匹配场景。诸如在代码库中搜索特定的函数名、类名或变量名时，关键词检索往往比语义检索更有效。常见实现包括：
+  * **全文检索**：使用 Elasticsearch、Solr 等搜索引擎，采用诸如 BM25, TF-IDF 等算法。
+  * **正则表达式匹配**：如 ripgrep、grep 等工具，Cursor 就采用了 ripgrep + 向量检索的混合方式
+
+* **语义化检索（Semantic Search）**。通过向量嵌入（Embeddings）来理解查询的语义含义，而不仅仅是字面匹配。这对于自然语言查询尤为重要：
+  * 使用预训练的嵌入模型（如 OpenAI text-embedding-3-large、Jina embeddings v3）将文本转换为向量
+  * 在向量空间中计算查询与文档的相似度（通常使用余弦相似度或点积）
+
+* **图检索（Graph-based Search）**。图检索不仅关注“内容相似”，更注重关系与上下文依赖。
+  * 代码场景下：构建代码调用关系图、依赖关系图，利用 AST（抽象语法树）提取方法、类、构造函数等结构
+  * 示例：微软的 [GraphRAG](https://github.com/microsoft/graphrag)，Aider 的 repomap，又或者是 Joern，CodeQL 这种基础设施
+
+而在检索之前，为了确保生成的检索结果可靠，需要引入**查询改写（Query Rewriting）**，即将用户的模糊意图逐步转化为数据库能够高效执行的精确查询。 <u>修改用户的原始查询来提升其与知识库中文档的相关性，解决了自然语言问题与存储数据块之间的“阻抗不匹配”问题 。</u>
+
+**代码场景下的 RAG 示例：**
+通常来说，多种不同的检索策略可以组合使用，以提升检索效果。如下是向量数据库 LanceDB 官方给的一个[Codebase RAG 实现](https://blog.lancedb.com/rag-codebase-1/)：
+
+![Codebase-RAG](https://github.com/user-attachments/assets/8cee6078-a96d-443c-9b62-81999a0cc90f)
+
+除了在 indexing 阶段使用了 TreeSitter 来生成知识，在[检索阶段](https://blog.lancedb.com/building-rag-on-codebases-part-2/) 还会使用：
+
+* **HyDE（假设性文档嵌入）**：先让模型根据查询生成一个“假设性”文档或代码片段，再用这个生成的内容做向量搜索，这样更容易找到语义相关的代码。
+* **BM25（关键字搜索）**：传统的关键字搜索算法，擅长找包含精确术语或 API 名称的代码，也可以和向量搜索配合使用。
+* **混合检索（Hybrid Search）**：把 BM25 和语义搜索结合起来，既能精确匹配关键字，也能理解代码语义，通过调整两者权重获得更优结果。
+* **重排序（Re-ranking）**：在向量搜索得到初步结果后，再用交叉注意力机制对结果重新排序，提高最终答案的相关性和准确度。
+
+当然了，在前面的 indexing 阶段，这个示例还会生成**元特征数据**，<u>即对每个元素或代码片段，我们先生成代码的文本描述，再将该描述进行向量嵌入， 以获取代码的所有元特征，其特征是通过微调后的 LLM 提取的。</u>
+
+### 上下文窗口的工程化
+
+![window](https://github.com/user-attachments/assets/eb3d3ddd-b46f-4fac-b94a-111f1783a366)
+
+两年前，GitHub Copilot 为补全为构建的上下文系统是业内 最值得研究的上下文系统（没有之一）：
+
+* **持续的信号监控**。Copilot 插件会持续监控来自 IDE 的一系列信号，以动态调整上下文的优先级。诸如于插入或删除字符、当前编辑的文件和语言的改变，光标移动、滚动位置变化、文件的打开与关闭。
+* **上下文来源的[优先级排序](https://github.com/mengjian-github/copilot-analysis)**。在发给模型的最终提示词里，会根据优化级来进行排序和筛选：
+  * **最高优先级**：光标位置周围的代码，包括光标前后的内容，这是最直接的上下文 。
+  * **高优先级**：当前正在编辑的文件的其余部分。
+  * **中等优先级**：在 IDE 中打开的其他文件或标签页（即“邻近文件”）。
+  * **辅助上下文**：其他信息也被纳入考量，包括文件路径、仓库 URL、代码中的导入语句（imports），以及 RAG 检索到的代码信息。
+* 上下文长度约束下的提示词组装。根据上述优先级对每个信息片段进行“评分”，然后组装出一个最优的提示。
+
+这也就可以为我们提供一个非常不错的参考：
+* **新鲜度优先**。最近编辑或访问的内容获得更高优先级，过时内容权重逐步衰减。
+* **信号融合与动态评分**。融合多种编辑信号（如光标移动、文件切换、导入变更等），动态调整上下文权重。
+* **滑窗与增量更新**。采用滑动窗口机制，仅对变化部分进行增量更新，避免全量重建。
+* **预算感知与自动截断**。实时估算 token 占用，接近限制时自动裁剪或摘要低优先级内容。
+
+当然这是一种非常复杂的设计，只值得你在足够高价值的系统中采用这样的设计。<u>而结合现在流行的各种 Cursor Rule/Spec，采用诸如 AGENTS.md 用持久化记忆 （Memory System）存储跨会话的关键信息，为后续查询提供长期背景信息。</u>
+
+### Agentic 检索
+
+**DeepResearch 示例**
+
+## Agent 工具系统的工程化设计
+
+
+## Agent 规划与超越单体 Agent
+
+## 小结
+
+>系统提示词（System Prompt）在 Agent 系统中的地位，远超一份简单的指令集；它实际上是 Agent 的核心“操作系统”，需要以系统架构设计的高度来对待提示词和上下文工程。
+
+利用 Markdown 或 XML 等标记语言来构建结构化的指令模块，可以显著提高 LLM 对复杂规则的理解和遵循能力。 通过明确的角色激活、详尽的行为规范、以及“即时”加载数据等上下文工程技术，开发者可以为 Agent 塑造一个稳定、可预测的“认知环境”， 从而将其行为引导至期望的轨道上。优秀的上下文工程是实现 Agent 行为可靠性的基础。
+
+<!-- 相关资源：
+
+* https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+* Agentic Design Patterns： https://docs.google.com/document/d/1rsaK53T3Lg5KoGwvf8ukOUvbELRtH-V0LnOIFDxBryE/edit?tab=t.0
+* Agentic Context Engineering: https://www.arxiv.org/pdf/2510.04618
+* A Survey on Large Language Model based Autonomous Agents: https://arxiv.org/pdf/2308.11432
+* Effective context engineering for AI agents
+* AGENTIC RETRIEVAL-AUGMENTED GENERATION: A SURVEY ON AGENTIC RAG
+* How to build reliable AI workflows with agentic primitives and context engineering -->
 
