@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="yyhappynice">
+
+
+
+
+
+<title>Attention 注意力机制 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+<body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `/bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">YuYi&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">YuYi&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+        
+            <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+                
+
+                    
+                        <article class="post-wrap">
+                            <header class="post-header">
+                                <h1 class="post-title">
+                                    Attention 注意力机制
+                                </h1>
+                                
+                                    <div class="post-meta">
+                                        
+                                            Author: <a itemprop="author" rel="author" href="/">yyhappynice</a>
+                                            
+
+                                                
+                                                    <span class="post-time">
+                                                        Date: <a href="#">October 18, 2025&nbsp;&nbsp;15:13:05</a>
+                                                    </span>
+                                                    
+                                                        
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/ai%E7%AC%94%E8%AE%B0/">ai笔记</a>
+                                                                    
+                                                            </span>
+                                                            
+                                    </div>
+                                    
+                            </header>
+
+                            <div class="post-content">
+                                <h2 id="什么是-Flash-Attention"><a href="#什么是-Flash-Attention" class="headerlink" title="什么是 Flash Attention?"></a>什么是 Flash Attention?</h2><blockquote>
+<p>Flash Attention 是一种优化的注意力机制, <strong>旨在提高深度学习模型中注意力计算的效率. 它通优化访存机制来加速训练和推理过程.</strong></p>
+</blockquote>
+<p><img src="https://github.com/user-attachments/assets/4e3e07f5-619a-4a22-af38-1701aa6c84c1" alt="FlashAttention"></p>
+<p>标准的注意力机制使用 HBM 来存储、读取和写入注意力分数矩阵（attention score matrix, 矩阵存储 Q&#x2F;K&#x2F;V). 具体步骤为将这些从 HBM 加载到 GPU 的片上 SRAM, 然后执行注意力机制的单个步骤, 然后写回 HBM, 并重复此过程.</p>
+<p>而 Flash Attention 则是采用分块计算（Tiling）技术，将大型注意力矩阵划分为多个块（tile），在 SRAM 中逐块执行计算。通过：</p>
+<ul>
+<li><strong>分块策略</strong>：将 Q&#x2F;K&#x2F;V 矩阵分块后流水线处理，避免存储完整的中间矩阵</li>
+<li><strong>重计算（Recomputation）</strong>：在反向传播时动态重新计算前向结果，而非存储中间值</li>
+<li><strong>IO优化</strong>：通过精确的内存访问控制，使数据在 HBM 和 SRAM 间的移动最小化</li>
+</ul>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>计算效率高</strong>：通过分块并行计算和半精度（FP16&#x2F;BF16）优化，充分利用 GPU Tensor Cores</li>
+<li><strong>内存使用减少</strong>：重计算技术减少 4-20 倍内存占用，支持更长序列训练</li>
+<li><strong>训练加速</strong>：反向传播通过延迟重计算优化，实现端到端 2-4 倍加速</li>
+<li><strong>精度保持</strong>：采用平铺分块策略时仍保持数值稳定性，支持混合精度训练</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><strong>实现复杂</strong>：由于需要对底层计算进行优化, Flash Attention 的实现可能比传统注意力机制更复杂.</li>
+<li><strong>硬件依赖</strong>：在某些情况下, 可能需要特定的硬件支持才能充分发挥其性能优势.</li>
+<li><strong>调试困难</strong>：优化后的计算过程可能导致调试和故障排查变得更加困难.</li>
+</ul>
+<p>总的来说, Flash Attention 是一种强大的工具, 能够在不牺牲性能的情况下提高模型的效率, 但在实现和使用时需要考虑其复杂性和硬件要求.</p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p><img src="https://github.com/user-attachments/assets/5b18e7cf-8bee-461f-bf56-135211a43ea1" alt="性能"></p>
+<p>当使用 H100 显卡且序列长度是512时（数据来自论文测试），PyTorch 的标准处理速度是 62 Tflops，而 Flash Attention 则可以达到 157 Tflops，Flash Attention 2 则可以达到215 Tflops。在 FP16&#x2F;BF16 精度下，实际加速比可达标准实现的 3-4 倍。</p>
+<h2 id="什么是-Multi-Head-Attention"><a href="#什么是-Multi-Head-Attention" class="headerlink" title="什么是 Multi-Head Attention?"></a>什么是 Multi-Head Attention?</h2><p>多头注意力（Multi-Head Attention）是 Transformer 架构中的一个核心组件，它通过并行运行多个注意力机制来增强模型的性能。</p>
+<p>在多头注意力机制中，”头”是指一个独立的注意力机制。每个头有自己的一组权重，用于计算输入的自注意力。通过使用多个头，模型可以从不同的角度和特征空间中提取信息。</p>
+<p><img src="https://github.com/user-attachments/assets/71ebb120-fbf2-476a-a458-12dd962c5d7c" alt="Multi-Head"></p>
+<h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><p>首先我们来看注意力公式, 给定输入向量 $Q$（查询）、$K$（键）和 $V$（值），注意力机制的计算公式为：</p>
+<p>$$<br>\text{Attention}(Q, K, V) &#x3D; \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V<br>$$</p>
+<p>其中，$d_k$ 是$K$ (键) 向量的维度。</p>
+<p>多头注意力则将上面的公式拆分, 通过多个独立的注意力头来增强模型的能力。每个头有自己的查询、键和值的线性变换。公式如下：</p>
+<p>$$<br>\text{MultiHead}(Q, K, V) &#x3D; \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O<br>$$</p>
+<p>其中每个 $\text{head}_i$ 计算为：</p>
+<p>$$<br>\text{head}_i &#x3D; \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)<br>$$</p>
+<p>$W_i^Q, W_i^K, W_i^V, W^O$ 是学习到的参数矩阵。</p>
+<p>多头注意力机制将输入分成多个”头”，每个头独立地执行自注意力计算，然后将所有头的输出合并起来。每个头可以关注输入序列的不同方面，从而捕获更丰富的特征信息。</p>
+<h3 id="核心机制"><a href="#核心机制" class="headerlink" title="核心机制"></a>核心机制</h3><ul>
+<li><strong>维度拆分</strong>：将输入向量维度 $d_{model}$ 通过线性投影拆分为$h$个$d_k$维度（$d_k$ &#x3D; $d_{model}&#x2F;h$），每个头关注不同的特征子空间</li>
+</ul>
+<h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>并行计算优化</strong>：虽然总计算量（FLOPs）与单头注意力相同，但拆分后的多个小矩阵乘法（尺寸$h×d_k$）更适配GPU并行计算特性 (当然实际 FLOPs 消耗会略高于单头，因为增加了投影矩阵计算)</li>
+</ul>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><p><strong>内存&#x2F;计算开销</strong>：每个头需要独立的 Q&#x2F;K&#x2F;V 投影矩阵，参数数量随头数线性增长：</p>
+<p>$$<br>3hd_kd_{model} \text{ (输入投影)} + hd_kd_{model} \text{ (输出投影)} &#x3D; 4hd_kd_{model}<br>$$</p>
+<p>其中：</p>
+<ul>
+<li>输入投影：每个头包含 $W_i^Q, W_i^K, W_i^V \in \mathbb{R}^{d_{model}\times d_k}$ 三个矩阵，共 $3hd_kd_{model}$ 参数</li>
+<li>输出投影：合并矩阵 $W^O \in \mathbb{R}^{hd_k\times d_{model}}$，贡献 $hd_kd_{model}$ 参数</li>
+<li>当采用标准配置 $d_k &#x3D; d_{model}&#x2F;h$ 时，总参数量简化为 $4d_{model}^2$（与头数无关）</li>
+</ul>
+</li>
+<li><p><strong>键值缓存瓶颈</strong>：自回归解码时每个头需要独立缓存 K&#x2F;V 矩阵，显存占用为 $2bd_{model}L$（b&#x3D;batch_size, L&#x3D;seq_len）</p>
+</li>
+<li><p><strong>信息冗余</strong>：实验表明不同头可能学习到相似的注意力模式（尤其在后层），造成计算资源浪费</p>
+</li>
+<li><p><strong>工程复杂度</strong>：多头并行计算需要精细的内存布局管理，在长序列场景下容易导致内存带宽瓶颈</p>
+</li>
+</ul>
+<h3 id="与-MQA-GQA-的对比"><a href="#与-MQA-GQA-的对比" class="headerlink" title="与 MQA&#x2F;GQA 的对比"></a>与 MQA&#x2F;GQA 的对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Multi-Head (MHA)</th>
+<th>Multi-Query (MQA)</th>
+<th>Grouped-Query (GQA)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>键值投影共享</td>
+<td>无</td>
+<td>所有头共享同一 K&#x2F;V 投影</td>
+<td>分组内共享 K&#x2F;V 投影</td>
+</tr>
+<tr>
+<td>参数量</td>
+<td>$4hd_kd_{model}$</td>
+<td>$hd_kd_{model} + 2d_kd_{model}$</td>
+<td>$(h + 2g)d_kd_{model}$</td>
+</tr>
+<tr>
+<td>解码显存占用</td>
+<td>高</td>
+<td>极低（1&#x2F;h）</td>
+<td>中等（g&#x2F;h）</td>
+</tr>
+<tr>
+<td>模型容量</td>
+<td>最高</td>
+<td>最低</td>
+<td>可调节（通过分组数 g）</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>编码器</td>
+<td>低内存推理场景</td>
+<td>质量与效率的平衡点</td>
+</tr>
+</tbody></table>
+<h2 id="什么是-Multi-Query-Attention"><a href="#什么是-Multi-Query-Attention" class="headerlink" title="什么是 Multi-Query Attention?"></a>什么是 Multi-Query Attention?</h2><blockquote>
+<p>多查询注意力（Multi-Query Attention）是 Transformer 解码器的优化版本，<strong>通过共享键&#x2F;值投影来显著降低内存消耗，特别适合自回归生成任务。</strong></p>
+</blockquote>
+<p><img src="https://github.com/user-attachments/assets/766f5fdb-0f7e-429d-b4da-7f72cb35487b" alt="Image"></p>
+<h3 id="工作原理-1"><a href="#工作原理-1" class="headerlink" title="工作原理"></a>工作原理</h3><p>在标准多头注意力基础上进行关键修改：所有注意力头共享同一组键（K）和值（V）的投影矩阵，仅保留查询（Q）的独立投影。公式如下：</p>
+<p>$$<br>\text{MultiQuery}(Q, K, V) &#x3D; \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O<br>$$</p>
+<p>其中每个 $\text{head}_i$ 计算为：</p>
+<p>$$<br>\text{head}_i &#x3D; \text{Attention}(QW_i^Q, KW^K, VW^V)<br>$$</p>
+<p>$W_i^Q \in \mathbb{R}^{d_{model}\times d_k}$ 保持独立，而 $W^K, W^V \in \mathbb{R}^{d_{model}\times d_k}$ 被所有头共享。</p>
+<h3 id="核心机制-1"><a href="#核心机制-1" class="headerlink" title="核心机制"></a>核心机制</h3><ul>
+<li><strong>键值共享</strong>：所有注意力头共享同一组 K&#x2F;V 投影矩阵，仅保留 Q 的独立投影</li>
+<li><strong>内存优化</strong>：自回归解码时只需缓存单组 K&#x2F;V 矩阵，显存占用降低为原始 MHA 的 $1&#x2F;h$</li>
+</ul>
+<h3 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>参数效率</strong>：投影矩阵参数量从 $4hd_kd_{model}$ 降为 $hd_kd_{model} + 2d_kd_{model}$（减少约 75%）</li>
+<li><strong>解码加速</strong>：KV 缓存量减少 h 倍，在长序列生成（如 2048 tokens）时显著降低内存带宽压力</li>
+<li><strong>硬件友好</strong>：共享的 K&#x2F;V 投影产生更规整的内存访问模式，提升 GPU&#x2F;TPU 利用率</li>
+</ul>
+<h3 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><strong>容量限制</strong>：共享 K&#x2F;V 投影削弱了模型对不同表示子空间的捕捉能力，可能影响生成质量</li>
+<li><strong>训练挑战</strong>：需要更谨慎的参数初始化来补偿表示能力的损失</li>
+<li><strong>工程复杂度</strong>：共享投影引入跨头依赖，增加分布式计算的同步开销</li>
+</ul>
+<h3 id="与-MHA-GQA-的对比"><a href="#与-MHA-GQA-的对比" class="headerlink" title="与 MHA&#x2F;GQA 的对比"></a>与 MHA&#x2F;GQA 的对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Multi-Head (MHA)</th>
+<th>Multi-Query (MQA)</th>
+<th>Grouped-Query (GQA)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>键值投影共享</td>
+<td>无</td>
+<td>所有头共享同一 K&#x2F;V 投影</td>
+<td>分组内共享 K&#x2F;V 投影</td>
+</tr>
+<tr>
+<td>参数量</td>
+<td>$4hd_kd_{model}$</td>
+<td>$(h + 2)d_kd_{model}$</td>
+<td>$(h + 2g)d_kd_{model}$</td>
+</tr>
+<tr>
+<td>解码显存占用</td>
+<td>$2bd_{model}L$</td>
+<td>$2bd_kL$</td>
+<td>$2bgd_kL$</td>
+</tr>
+<tr>
+<td>模型质量</td>
+<td>最优</td>
+<td>基线模型 90%-95%</td>
+<td>接近 MHA (98%-99%)</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>预训练</td>
+<td>低内存推理场景</td>
+<td>生产环境部署</td>
+</tr>
+</tbody></table>
+<h2 id="什么是-Grouped-Query-Attention"><a href="#什么是-Grouped-Query-Attention" class="headerlink" title="什么是 Grouped-Query Attention?"></a>什么是 Grouped-Query Attention?</h2><p>Grouped-Query Attention（分组查询注意力）是 Transformer 架构的改进型注意力机制，在多头注意力（MHA）和多查询注意力（MQA）之间取得平衡。通过分组共享键值投影，在保持模型容量的同时显著降低计算资源消耗。</p>
+<p><img src="https://github.com/user-attachments/assets/f6dceb73-8d38-41a0-8927-6194972e2b7e" alt="Grouped-Query"></p>
+<h3 id="工作原理-2"><a href="#工作原理-2" class="headerlink" title="工作原理"></a>工作原理</h3><p>在标准多头注意力基础上进行关键修改：所有注意力头共享同一组键（K）和值（V）的投影矩阵，仅保留查询（Q）的独立投影。公式如下：</p>
+<p>$$<br>\text{MultiQuery}(Q, K, V) &#x3D; \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O<br>$$</p>
+<p>其中每个 $\text{head}_i$ 计算为：</p>
+<p>$$<br>\text{head}_i &#x3D; \text{Attention}(QW_i^Q, KW^K, VW^V)<br>$$</p>
+<p>$W_i^Q \in \mathbb{R}^{d_{model}\times d_k}$ 保持独立，而 $W^K, W^V \in \mathbb{R}^{d_{model}\times d_k}$ 被所有头共享。</p>
+<h3 id="核心机制-2"><a href="#核心机制-2" class="headerlink" title="核心机制"></a>核心机制</h3><ul>
+<li><strong>键值共享</strong>：所有注意力头共享同一组 K&#x2F;V 投影矩阵，仅保留 Q 的独立投影</li>
+<li><strong>内存优化</strong>：自回归解码时只需缓存单组 K&#x2F;V 矩阵，显存占用降低为原始 MHA 的 $1&#x2F;h$</li>
+</ul>
+<h3 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>参数效率</strong>：投影矩阵参数量从 $4hd_kd_{model}$ 降为 $hd_kd_{model} + 2d_kd_{model}$（减少约 75%）</li>
+<li><strong>解码加速</strong>：KV 缓存量减少 h 倍，在长序列生成（如 2048 tokens）时显著降低内存带宽压力</li>
+<li><strong>硬件友好</strong>：共享的 K&#x2F;V 投影产生更规整的内存访问模式，提升 GPU&#x2F;TPU 利用率</li>
+</ul>
+<h3 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><strong>容量限制</strong>：共享 K&#x2F;V 投影削弱了模型对不同表示子空间的捕捉能力，可能影响生成质量</li>
+<li><strong>训练挑战</strong>：需要更谨慎的参数初始化来补偿表示能力的损失</li>
+<li><strong>工程复杂度</strong>：共享投影引入跨头依赖，增加分布式计算的同步开销</li>
+</ul>
+<h3 id="与-MHA-GQA-的对比-1"><a href="#与-MHA-GQA-的对比-1" class="headerlink" title="与 MHA&#x2F;GQA 的对比"></a>与 MHA&#x2F;GQA 的对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Multi-Head (MHA)</th>
+<th>Multi-Query (MQA)</th>
+<th>Grouped-Query (GQA)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>键值投影共享</td>
+<td>无</td>
+<td>所有头共享同一 K&#x2F;V 投影</td>
+<td>分组内共享 K&#x2F;V 投影</td>
+</tr>
+<tr>
+<td>参数量</td>
+<td>$4hd_kd_{model}$</td>
+<td>$(h + 2)d_kd_{model}$</td>
+<td>$(h + 2g)d_kd_{model}$</td>
+</tr>
+<tr>
+<td>解码显存占用</td>
+<td>$2bd_{model}L$</td>
+<td>$2bd_kL$</td>
+<td>$2bgd_kL$</td>
+</tr>
+<tr>
+<td>模型质量</td>
+<td>最优</td>
+<td>基线模型 90%-95%</td>
+<td>接近 MHA (98%-99%)</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>预训练</td>
+<td>低内存推理场景</td>
+<td>生产环境部署</td>
+</tr>
+</tbody></table>
+
+                            </div>
+
+                            
+                                <section class="post-copyright">
+                                    
+                                        <p class="copyright-item">
+                                            <span>Author:</span>
+                                            <span>yyhappynice</span>
+                                        </p>
+                                        
+                                            
+                                                <p class="copyright-item">
+                                                    <span>Permalink:</span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/10/18/ai-base3/">https://yyhappynice.github.io/2025/10/18/ai-base3/</a></span>
+                                                </p>
+                                                
+                                                    
+                                                        <p class="copyright-item">
+                                                            <span>License:</span>
+                                                            <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                                                        </p>
+                                                        
+                                                            
+                                                                <p class="copyright-item">
+                                                                    <span>Slogan:</span>
+                                                                    <span>Do you believe in <strong>DESTINY</strong>?</span>
+                                                                </p>
+                                                                
+
+                                </section>
+                                
+                                    <section class="post-tags">
+                                        <div>
+                                            <span>Tag(s):</span>
+                                            <span class="tag">
+                                                
+                                                    
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
+                                                        
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
+                                                        
+                                                            
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:window.history.back();">back</a>
+                                            <span>· </span>
+                                            <a href="/">home</a>
+                                        </div>
+                                    </section>
+                                    <section class="post-nav">
+                                        
+                                            <a class="prev" rel="prev" href="/2025/11/02/langChainjs1/">LangChainjs 入门&体验(一)</a>
+                                            
+                                                
+                                                    <a class="next" rel="next" href="/2025/10/12/ai-base2/">LLM 蒸馏 & Transformer</a>
+                                                    
+                                    </section>
+
+                                    <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxNTk5NTcwNzA=" data-category="Announcements" data-category-id="DIC_kwDOCYjATs4Cwd0z"
+  data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+  data-theme="preferred_color_scheme" data-lang="zh-CN" crossorigin="anonymous" async>
+  </script>
+
+                        </article>
+</div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© yyhappynice | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

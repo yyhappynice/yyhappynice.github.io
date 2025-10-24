@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="yyhappynice">
+
+
+
+
+
+<title>LLM 蒸馏 &amp; Transformer | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+<body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `/bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">YuYi&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">YuYi&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+        
+            <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+                
+
+                    
+                        <article class="post-wrap">
+                            <header class="post-header">
+                                <h1 class="post-title">
+                                    LLM 蒸馏 &amp; Transformer
+                                </h1>
+                                
+                                    <div class="post-meta">
+                                        
+                                            Author: <a itemprop="author" rel="author" href="/">yyhappynice</a>
+                                            
+
+                                                
+                                                    <span class="post-time">
+                                                        Date: <a href="#">October 12, 2025&nbsp;&nbsp;20:23:09</a>
+                                                    </span>
+                                                    
+                                                        
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/ai%E7%AC%94%E8%AE%B0/">ai笔记</a>
+                                                                    
+                                                            </span>
+                                                            
+                                    </div>
+                                    
+                            </header>
+
+                            <div class="post-content">
+                                <h2 id="LLM-蒸馏"><a href="#LLM-蒸馏" class="headerlink" title="LLM 蒸馏"></a>LLM 蒸馏</h2><h3 id="什么是-LLM-蒸馏技术"><a href="#什么是-LLM-蒸馏技术" class="headerlink" title="什么是 LLM 蒸馏技术?"></a>什么是 LLM 蒸馏技术?</h3><blockquote>
+<p>LLM 蒸馏 (Distillation) 是一种模型压缩技术，<strong>用于将大型语言模型 (LLM) 的知识转移到较小的模型中</strong>。其主要目的是<strong>在保持模型性能的同时，减少模型的大小和计算资源需求</strong>。通过蒸馏技术，较小的模型可以在推理时更高效地运行，适用于资源受限的环境。</p>
+</blockquote>
+<p><img src="https://github.com/user-attachments/assets/4cdd90b7-44a1-457e-b4ec-f17b2da272cf" alt="llm蒸馏"></p>
+<h3 id="蒸馏过程"><a href="#蒸馏过程" class="headerlink" title="蒸馏过程"></a>蒸馏过程</h3><p>蒸馏过程通常包括以下几个步骤：</p>
+<ul>
+<li><strong>训练教师模型</strong>：首先训练一个大型且性能优越的教师模型。</li>
+<li><strong>生成软标签</strong>：使用教师模型对训练数据进行预测，生成软目标 (soft targets) ，这些目标包含了教师模型的概率分布信息。</li>
+<li><strong>训练学生模型</strong>：使用软目标 (soft targets) 和原始训练数据 (hard targets) 来训练较小的学生模型，使其能够模仿教师模型的行为。 这种方法不仅可以提高模型的效率，还可以在某些情况下提高模型的泛化能力。</li>
+</ul>
+<h3 id="蒸馏的优点"><a href="#蒸馏的优点" class="headerlink" title="蒸馏的优点"></a>蒸馏的优点</h3><ul>
+<li>减少模型大小和计算资源需求</li>
+<li>增加推理速度</li>
+<li>易于访问和部署</li>
+</ul>
+<p>(其实就是小模型相对于大模型的优点)</p>
+<h3 id="蒸馏可能存在的问题"><a href="#蒸馏可能存在的问题" class="headerlink" title="蒸馏可能存在的问题"></a>蒸馏可能存在的问题</h3><ul>
+<li><strong>信息丢失</strong>：由于学生模型比教师模型小，可能无法完全捕捉教师模型的所有知识和细节，导致信息丢失。</li>
+<li><strong>依赖教师模型</strong>：学生模型的性能高度依赖于教师模型的质量，如果教师模型本身存在偏差或错误，学生模型可能会继承这些问题。</li>
+<li><strong>适用性限制</strong>：蒸馏技术可能不适用于所有类型的模型或任务，尤其是那些需要高精度和复杂推理的任务。</li>
+</ul>
+<h3 id="典型例子"><a href="#典型例子" class="headerlink" title="典型例子"></a>典型例子</h3><ul>
+<li><strong>GPT-4o</strong> (教师模型) 中提炼出 GPT-4o-mini (学生模型)</li>
+<li><strong>DeepSeek-R1</strong> (教师模型) 中提炼出 DeepSeek-R1-Distill-Qwen-32B (学生模型) (这个不是传统意义上的蒸馏了, 是蒸馏+数据增强+微调)</li>
+</ul>
+<h3 id="其他蒸馏技术"><a href="#其他蒸馏技术" class="headerlink" title="其他蒸馏技术"></a>其他蒸馏技术</h3><ul>
+<li><strong>数据增强</strong>: 使用教师模型生成额外的训练数据。通过创建更大、更具包容性的数据集，学生可以接触到更广泛的场景和示例，从而提高其泛化性能。</li>
+<li><strong>中间层蒸馏</strong>: 将知识从教师模型的中间层转移到学生。通过学习这些中间表示，学生可以捕获更详细和结构化的信息，从而获得更好的整体表现。</li>
+<li><strong>多教师蒸馏</strong>: 通过汇总不同教师模型的知识，学生模型可以实现更全面的理解并提高稳健性，因为它整合了不同的观点和见解。</li>
+</ul>
+<h3 id="Refs"><a href="#Refs" class="headerlink" title="Refs"></a>Refs</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2006.05525">Knowledge Distillation: A Survey</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1503.02531">Distilling the Knowledge in a Neural Network</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.datacamp.com/blog/distillation-llm">LLM Distillation Explained: Applications, Implementation &amp; More</a></li>
+</ul>
+<h2 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer"></a>Transformer</h2><h3 id="什么是-Transformer"><a href="#什么是-Transformer" class="headerlink" title="什么是 Transformer?"></a>什么是 Transformer?</h3><blockquote>
+<p><strong>Transformer 是一种用于自然语言处理 (NLP) 的深度学习模型架构</strong>, 由 Vaswani 等人在 2017 年提出. 它主要用于处理序列到序列的任务, 如机器翻译, 文本生成等.</p>
+</blockquote>
+<p>简单来讲, 文本生成的 Transformer 模型的原理是——<strong>“预测下一个词”</strong>.</p>
+<p><strong>用户给定的文本 (prompt), 模型会预测下一个词最有可能是什么. Transformer 的核心创新和强大之处在于它使用的自注意力机制（self-attention mechanism）, 这使得它们能够处理整个序列, 并比之前的架构 (RNN) 更有效地捕捉长距离依赖关系.</strong></p>
+<p>另外需要注意的是, GitHub 上的 huggingface&#x2F;transformers 是 HuggingFace 实现的 Transformer 模型库, 包括了 Transformer 的实现和大量的预训练模型.</p>
+<p>目前的 LLM 基本都基于 Transformer 架构, 并对其进行优化技术和训练方法的改进.</p>
+<p><img src="https://github.com/user-attachments/assets/d368ee46-1b89-456c-8077-50e077fbcf5f" alt="Transformer"></p>
+<h3 id="Transformer-的结构"><a href="#Transformer-的结构" class="headerlink" title="Transformer 的结构"></a>Transformer 的结构</h3><p>每个文本生成 Transformer 都由以下三个关键组件构成：</p>
+<h4 id="嵌入层（Embedding）："><a href="#嵌入层（Embedding）：" class="headerlink" title="嵌入层（Embedding）："></a>嵌入层（Embedding）：</h4><ul>
+<li>文本输入被分割成称为词元（token）的更小单位, 可以是单词或子词</li>
+<li><u>这些词元被转换成称为嵌入（embeddings）的数值向量</u></li>
+<li>这些嵌入向量能够捕捉词语的语义含义</li>
+</ul>
+<h4 id="Transformer-块："><a href="#Transformer-块：" class="headerlink" title="Transformer 块："></a>Transformer 块：</h4><p>这是模型处理和转换输入数据的基本构建单元. 每个块包括：</p>
+<ul>
+<li><p><strong>注意力机制（Attention Mechanism）：</strong></p>
+<ul>
+<li>Transformer 块的核心组件</li>
+<li>允许词元之间相互通信</li>
+<li>捕捉词语之间的上下文信息和关系</li>
+</ul>
+</li>
+<li><p><strong>多层感知器（MLP）层：</strong></p>
+<ul>
+<li>一个前馈网络, 独立处理每个词元</li>
+<li>注意力层的目标是在词元之间路由信息</li>
+<li>MLP 的目标是优化每个词元的表示</li>
+</ul>
+</li>
+</ul>
+<h4 id="输出概率（Output-Probabilities）："><a href="#输出概率（Output-Probabilities）：" class="headerlink" title="输出概率（Output Probabilities）："></a>输出概率（Output Probabilities）：</h4><ul>
+<li>最终的线性层和 softmax 层</li>
+<li>将处理后的嵌入转换为概率</li>
+<li>使模型能够预测序列中的下一个词元</li>
+</ul>
+<h3 id="Transformer-的优点："><a href="#Transformer-的优点：" class="headerlink" title="Transformer 的优点："></a>Transformer 的优点：</h3><ul>
+<li><strong>并行化处理</strong>：与 RNN 不同, Transformer 不需要按顺序处理数据, 因此可以更好地利用 GPU 进行并行计算, 提高训练速度.</li>
+<li><strong>长距离依赖</strong>：自注意力机制使得 Transformer 能够有效捕捉序列中远距离的依赖关系.</li>
+<li><strong>灵活性</strong>：Transformer 可以很容易地扩展到更大的模型 (如BERT、GPT等) , 并在多种 NLP 任务中表现出色.</li>
+</ul>
+<h3 id="Transformer-的缺点："><a href="#Transformer-的缺点：" class="headerlink" title="Transformer 的缺点："></a>Transformer 的缺点：</h3><ul>
+<li><strong>计算复杂度高</strong>：自注意力机制的计算复杂度为O(n^2), 当输入序列长度较长时, 计算资源消耗较大.</li>
+<li><strong>数据需求大</strong>：Transformer 通常需要大量的数据进行训练, 以便充分发挥其性能.</li>
+<li><strong>缺乏内在的序列信息</strong>：由于没有内置的序列处理机制 (如 RNN 中的时间步) , 需要额外的机制 (如位置编码) 来引入序列信息.</li>
+</ul>
+<h2 id="Transformer-的优化方案都有哪些"><a href="#Transformer-的优化方案都有哪些" class="headerlink" title="Transformer 的优化方案都有哪些?"></a>Transformer 的优化方案都有哪些?</h2><blockquote>
+<p>目前使用 Transformer 架构的模型, 都使用了一些优化方案来达到更好的效果或更高的性能, 所以我整理了常见的优化方案 (包括训练和推理), 后续会详细讲解每个优化方案的技术细节.</p>
+</blockquote>
+<p><img src="https://github.com/user-attachments/assets/6823137a-0c50-4852-9fcc-a8e143677945" alt="Transformer优化"></p>
+<h3 id="注意力机制优化"><a href="#注意力机制优化" class="headerlink" title="注意力机制优化"></a>注意力机制优化</h3><ul>
+<li><p><strong>Flash Attention</strong></p>
+<ul>
+<li>减少内存访问和计算复杂度, 显著提升训练和推理速度</li>
+<li>被 Llama2, Qwen, PaLM2, Mistral, DeepSeek 等采用</li>
+<li>部分闭源模型可能采用类似技术或自研方案</li>
+</ul>
+</li>
+<li><p><strong>Multi-Query Attention (MQA)</strong></p>
+<ul>
+<li>减少 Key 和 Value 的头数, 降低内存使用和计算量</li>
+<li>被 PaLM, Falcon, BLOOM 等采用</li>
+</ul>
+</li>
+<li><p><strong>Grouped-Query Attention (GQA)</strong></p>
+<ul>
+<li>MQA 的改进版本, 通过分组共享 Key&#x2F;Value 矩阵（而非完全独立）实现性能和效率的平衡</li>
+<li>被 Llama2, PaLM2, Gemini, Mistral, DeepSeek 等采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="位置编码优化"><a href="#位置编码优化" class="headerlink" title="位置编码优化"></a>位置编码优化</h3><ul>
+<li><p><strong>RoPE (Rotary Position Embedding)</strong></p>
+<ul>
+<li>通过旋转矩阵实现相对位置编码, 支持更好的长度外推性</li>
+<li>被 Llama, DeepSeek, Qwen, Mistral, Falcon, PaLM 等广泛采用</li>
+<li>支持 NTK-aware 插值和 Dynamic NTK 等长度扩展方法</li>
+</ul>
+</li>
+<li><p><strong>ALiBi (Attention with Linear Biases)</strong></p>
+<ul>
+<li>线性注意力偏置, 有助于外推到更长序列</li>
+<li>被 Bloom, Stable LM 等采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="架构优化"><a href="#架构优化" class="headerlink" title="架构优化"></a>架构优化</h3><ul>
+<li><p><strong>并行计算优化</strong></p>
+<ul>
+<li>通过解耦注意力层和前馈层的计算路径，实现：<ul>
+<li>减少层间计算依赖，提升计算并行度</li>
+<li>优化内存访问模式，降低显存占用</li>
+<li>提高计算资源利用率（特别是 Tensor Core）</li>
+<li>支持更大 batch size 的训练</li>
+</ul>
+</li>
+<li>典型实现方案：<ul>
+<li><strong>PaLM 并行结构</strong>：同时计算注意力层和前馈层，结果合并后做残差连接</li>
+<li><strong>GPT-3 模型并行</strong>：通过张量&#x2F;流水线并行实现超大规模模型训练</li>
+</ul>
+</li>
+<li>被 PaLM, GPT-3, T5, Megatron-LM 等模型采用</li>
+</ul>
+</li>
+<li><p><strong>激活函数优化</strong></p>
+<ul>
+<li>使用 SwiGLU 替代标准 FFN 中的激活函数, 提供更好的性能</li>
+<li>被 PaLM, Llama2, Gemini, Qwen 等采用</li>
+</ul>
+</li>
+<li><p><strong>稀疏专家模型 (MoE)</strong></p>
+<ul>
+<li>通过多个专家网络实现大规模参数扩展</li>
+<li>被 Mixture-of-Experts, Switch Transformer 等采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="上下文长度扩展"><a href="#上下文长度扩展" class="headerlink" title="上下文长度扩展"></a>上下文长度扩展</h3><ul>
+<li><p><strong>滑动窗口注意力</strong></p>
+<ul>
+<li><u>局部注意力机制, 减少内存使用, 支持更长序列处理</u></li>
+<li>被 Longformer, BigBird 等采用</li>
+</ul>
+</li>
+<li><p><strong>稀疏注意力</strong></p>
+<ul>
+<li><u>只关注重要的 token, 降低计算复杂度, 提高处理长序列的能力</u></li>
+<li>被 Sparse Transformer, Reformer, Longformer 等采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="内存优化"><a href="#内存优化" class="headerlink" title="内存优化"></a>内存优化</h3><ul>
+<li><strong>参数共享</strong><ul>
+<li>跨层参数复用, 减少模型参数量, 降低内存需求</li>
+<li>被 ALBERT, T5 等采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="训练优化"><a href="#训练优化" class="headerlink" title="训练优化"></a>训练优化</h3><ul>
+<li><p><strong>混合精度训练</strong></p>
+<ul>
+<li>FP16&#x2F;BF16 混合精度训练广泛应用于大模型训练</li>
+<li>FP8 目前主要用于推理阶段（如 NVIDIA H100）, 但 DeepSeek-V3 使用了 FP8 训练, 带来了巨大的成本优势, 甚至最新的论文还尝试了 FP4 训练</li>
+<li>大多数现代大模型使用 BF16 训练</li>
+</ul>
+</li>
+<li><p><strong>梯度检查点</strong></p>
+<ul>
+<li>训练时动态重计算, 节省显存, 略微增加计算时间</li>
+<li>被大模型训练普遍采用</li>
+</ul>
+</li>
+</ul>
+<h3 id="推理优化"><a href="#推理优化" class="headerlink" title="推理优化"></a>推理优化</h3><ul>
+<li><p><strong>KV Cache</strong></p>
+<ul>
+<li>通过缓存历史 token 的 Key&#x2F;Value 矩阵实现：<ul>
+<li>避免重复计算历史 token 的注意力结果</li>
+<li>减少解码时的计算量（复杂度从 O(n²) 降为 O(n)）</li>
+<li>降低内存带宽需求，提升推理速度</li>
+<li>支持更长的上下文处理</li>
+</ul>
+</li>
+<li>内存管理策略：<ul>
+<li>预分配固定长度内存</li>
+<li>动态扩展机制（如 vLLM 的 PagedAttention）</li>
+</ul>
+</li>
+<li>被 Llama 系列、GPT 系列、PaLM、Gemini、Qwen 等主流模型采用</li>
+</ul>
+</li>
+<li><p><strong>量化技术</strong></p>
+<ul>
+<li>NT8&#x2F;INT4 量化, 减少模型大小和内存占用, 加快推理速度</li>
+<li>主流量化方法包括 GPTQ, AWQ 等</li>
+<li>支持 per-tensor 和 per-channel 量化粒度</li>
+<li>被 LLaMA-2, ChatGLM, Qwen, Mistral, Yi 等采用</li>
+</ul>
+</li>
+<li><p><strong>推理加速技术</strong></p>
+<ul>
+<li>推测解码 (Speculative Decoding)</li>
+<li>连续批处理 (Continuous Batching)</li>
+<li>动态批处理, 提高 GPU 利用率</li>
+</ul>
+</li>
+</ul>
+<h3 id="特定硬件优化"><a href="#特定硬件优化" class="headerlink" title="特定硬件优化"></a>特定硬件优化</h3><ul>
+<li><strong>GPU 特化</strong><ul>
+<li>CUDA 核心优化</li>
+<li>Tensor Core 利用</li>
+<li>显存访问优化</li>
+<li>算子融合</li>
+<li>内存布局优化</li>
+</ul>
+</li>
+</ul>
+<p>这些优化方案通常会组合使用，不同的模型会根据自己的具体需求选择合适的优化方案。比如：</p>
+<ul>
+<li><strong>Llama2</strong>: 采用 GQA + RoPE + Flash Attention</li>
+<li><strong>PaLM2</strong>: 使用 GQA + 并行计算优化</li>
+<li><strong>Qwen</strong>: 采用 Flash Attention + RoPE</li>
+</ul>
+
+                            </div>
+
+                            
+                                <section class="post-copyright">
+                                    
+                                        <p class="copyright-item">
+                                            <span>Author:</span>
+                                            <span>yyhappynice</span>
+                                        </p>
+                                        
+                                            
+                                                <p class="copyright-item">
+                                                    <span>Permalink:</span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/10/12/ai-base2/">https://yyhappynice.github.io/2025/10/12/ai-base2/</a></span>
+                                                </p>
+                                                
+                                                    
+                                                        <p class="copyright-item">
+                                                            <span>License:</span>
+                                                            <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                                                        </p>
+                                                        
+                                                            
+                                                                <p class="copyright-item">
+                                                                    <span>Slogan:</span>
+                                                                    <span>Do you believe in <strong>DESTINY</strong>?</span>
+                                                                </p>
+                                                                
+
+                                </section>
+                                
+                                    <section class="post-tags">
+                                        <div>
+                                            <span>Tag(s):</span>
+                                            <span class="tag">
+                                                
+                                                    
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
+                                                        
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
+                                                        
+                                                            
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:window.history.back();">back</a>
+                                            <span>· </span>
+                                            <a href="/">home</a>
+                                        </div>
+                                    </section>
+                                    <section class="post-nav">
+                                        
+                                            <a class="prev" rel="prev" href="/2025/10/18/ai-base3/">Attention 注意力机制</a>
+                                            
+                                                
+                                                    <a class="next" rel="next" href="/2025/09/30/ai-base1/">大模型 GGUF 文件格式 & 推测性解码</a>
+                                                    
+                                    </section>
+
+                                    <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxNTk5NTcwNzA=" data-category="Announcements" data-category-id="DIC_kwDOCYjATs4Cwd0z"
+  data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+  data-theme="preferred_color_scheme" data-lang="zh-CN" crossorigin="anonymous" async>
+  </script>
+
+                        </article>
+</div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© yyhappynice | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="yyhappynice">
+
+
+
+
+
+<title>大模型 GGUF 文件格式 &amp; 推测性解码 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+<body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `/bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">YuYi&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">YuYi&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+        
+            <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+                
+
+                    
+                        <article class="post-wrap">
+                            <header class="post-header">
+                                <h1 class="post-title">
+                                    大模型 GGUF 文件格式 &amp; 推测性解码
+                                </h1>
+                                
+                                    <div class="post-meta">
+                                        
+                                            Author: <a itemprop="author" rel="author" href="/">yyhappynice</a>
+                                            
+
+                                                
+                                                    <span class="post-time">
+                                                        Date: <a href="#">September 30, 2025&nbsp;&nbsp;15:04:40</a>
+                                                    </span>
+                                                    
+                                                        
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/ai%E7%AC%94%E8%AE%B0/">ai笔记</a>
+                                                                    
+                                                            </span>
+                                                            
+                                    </div>
+                                    
+                            </header>
+
+                            <div class="post-content">
+                                <h2 id="什么是-GGUF"><a href="#什么是-GGUF" class="headerlink" title="什么是 GGUF"></a>什么是 GGUF</h2><p><a target="_blank" rel="noopener" href="https://github.com/ggml-org/ggml/blob/master/docs/gguf.md">GGUF</a>（GGML Universal File）是一种专为大型语言模型（LLM）设计的文件格式。它旨在解决大型模型在实际应用中遇到的存储效率、加载速度、兼容性和扩展性等问题，从而简化 LLM 的使用和部署。</p>
+<p><img src="https://github.com/user-attachments/assets/acb421ab-2608-4875-b9d6-77db822862bd" alt="GGUF图"></p>
+<h3 id="GGUF-的主要特点和优势"><a href="#GGUF-的主要特点和优势" class="headerlink" title="GGUF 的主要特点和优势"></a>GGUF 的主要特点和优势</h3><ul>
+<li><strong>高效存储</strong>： GGUF 格式优化了数据的存储方式，减少了存储空间的占用，这对于包含大量参数的大型模型尤为重要。它采用<u>紧凑的二进制编码格式</u>和<u>优化的数据结构</u>来高效地保存模型参数（权重和偏差）。</li>
+<li><strong>单文件部署</strong>： 它们可以轻松分发和加载，加载模型所需的所有信息都包含在模型文件中，不需要任何外部文件来获取附加信息。</li>
+<li><strong>快速加载</strong>： GGUF 格式支持快速加载模型数据（使用 mmap），这对于需要即时响应的应用场景非常有用，例如在线聊天机器人或实时翻译系统。</li>
+<li><strong>跨平台兼容性</strong>： GGUF 兼容多种编程语言，例如 Python 和 R，非常方便在不同平台和环境中使用。大部分语言都可以使用少量代码轻松加载和保存模型，无需外部库。</li>
+<li><strong>支持微调</strong>： GGUF 支持微调，允许用户根据特定的应用场景调整 LLM，并存储跨应用部署模型的提示模板。</li>
+<li><strong>取代 GGML</strong>： GGUF 是 GGML 的替代者。GGML 由于在灵活性和扩展性方面存在一些限制，已被弃用，由 GGUF 取代。</li>
+</ul>
+<h3 id="GGUF-的应用"><a href="#GGUF-的应用" class="headerlink" title="GGUF 的应用"></a>GGUF 的应用</h3><p>GGUF 格式的模型文件可以用于各种应用场景，例如：</p>
+<ul>
+<li><strong>本地部署 LLM</strong>： GGUF 格式使得在消费级计算机硬件（包括 CPU 和 GPU）上运行 LLM 成为可能。</li>
+<li><strong>移动设备上的 LLM 推理</strong>： 由于其高效的存储和加载特性，GGUF 也适用于在移动设备上进行 LLM 推理。</li>
+<li><strong>快速原型开发</strong>： GGUF 使得开发者可以更快速地加载和测试不同的 LLM 模型。</li>
+</ul>
+<p>总而言之，GGUF 是一种重要的 LLM 文件格式，它通过提高存储效率、加载速度和兼容性，简化了 LLM 的使用和部署，并有望成为未来大模型文件标准格式之一。</p>
+<h2 id="如何本地运行-GGUF-格式的-LLM-模型"><a href="#如何本地运行-GGUF-格式的-LLM-模型" class="headerlink" title="如何本地运行 GGUF 格式的 LLM 模型?"></a>如何本地运行 GGUF 格式的 LLM 模型?</h2><h3 id="模型下载"><a href="#模型下载" class="headerlink" title="模型下载"></a>模型下载</h3><blockquote><p>这里下载的是 unsloth 团队的量化版本.</p>
+<p><strong>下载地址</strong>: <a target="_blank" rel="noopener" href="https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF/tree/main">https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF/tree/main</a></p>
+</blockquote>
+<p><img src="https://github.com/user-attachments/assets/d2e97832-aeff-4258-b17b-d3cc46b715f3" alt="下载截图"><br>注意这个是个合集包, 里面有 Q2-Q8 的量化版本, 选中你喜欢的量化版本, 点击这个下载按钮即可. 不需要全部下载.</p>
+<h3 id="编译-llama-cpp"><a href="#编译-llama-cpp" class="headerlink" title="编译 llama.cpp"></a>编译 llama.cpp</h3><p>由于这个模型比较新 (2025-01-21发布的), 所以需要编译最新的 llama.cpp 才能支持这个模型.</p>
+<p>首先下载 llama.cpp 的源码, 然后编译.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ggerganov/llama.cpp</span><br><span class="line"><span class="built_in">cd</span> llama.cpp</span><br><span class="line">cmake -B build</span><br><span class="line">cmake --build build --config Release -j</span><br></pre></td></tr></table></figure>
+<p>如果你的电脑没有 cmake, 请自己搜索如何安装 cmake. 问问 LLM 是好方法.</p>
+<h3 id="模型运行"><a href="#模型运行" class="headerlink" title="模型运行"></a>模型运行</h3><p>直接运行编译好的 llama.cpp 即可.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./build/bin/llama-server -m /data/unslouth/DeepSeek-R1-Distill-Qwen-32B-GGUF/DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf --host 0.0.0.0 --port 9990</span><br></pre></td></tr></table></figure>
+
+<h3 id="ok-啦"><a href="#ok-啦" class="headerlink" title="ok 啦~!"></a>ok 啦~!</h3><p>在浏览器访问你指定的 IP 和端口, 例如 <a target="_blank" rel="noopener" href="http://192.168.1.2:9990/">http://192.168.1.2:9990</a> 即可.</p>
+<p><img src="https://github.com/user-attachments/assets/ed52a479-b540-4625-b7c9-e2ab22070b14" alt="访问"></p>
+<h2 id="推测性解码"><a href="#推测性解码" class="headerlink" title="推测性解码"></a>推测性解码</h2><p>推测性解码是一种用于优化大语言模型推理性能的技术。它的核心思想是：<u>在当前大模型生成当前 token 的同时，使用小的草稿模型对未来的 token 进行预测。</u><br><img src="https://github.com/user-attachments/assets/c0b33ae6-0ee0-40c4-b18d-2d62bdd22f25" alt="推测性解码"></p>
+<h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><h4 id="双模型结构："><a href="#双模型结构：" class="headerlink" title="双模型结构："></a>双模型结构：</h4><ul>
+<li><strong>主模型（Target Model）</strong>：完整的大语言模型，精度高但速度较慢</li>
+<li><strong>草稿模型（Draft Model）</strong>：较小的模型，速度快但精度较低</li>
+</ul>
+<h4 id="多头预测："><a href="#多头预测：" class="headerlink" title="多头预测："></a>多头预测：</h4><ul>
+<li>在模型中添加多个预测头（speculative heads）</li>
+<li>每个预测头负责预测未来的一个 token（N+1, N+2, N+3…）</li>
+<li>可以在单次前向传播中预测多个 token</li>
+<li>使用较小的草稿模型快速预测多个可能的后续 token</li>
+<li>草稿模型通常是主模型的蒸馏版本或更小的变体</li>
+</ul>
+<h4 id="验证机制："><a href="#验证机制：" class="headerlink" title="验证机制："></a>验证机制：</h4><ul>
+<li>主模型会验证草稿模型预测的 token 序列</li>
+<li>如果预测正确，就可以直接使用</li>
+<li>如果预测错误，则回退到主模型重新生成</li>
+</ul>
+<h3 id="性能提升"><a href="#性能提升" class="headerlink" title="性能提升"></a>性能提升</h3><p>根据文章报告的数据：</p>
+<ul>
+<li>语言模型可获得约 2 倍的速度提升</li>
+<li>代码模型可获得约 3 倍的速度提升</li>
+</ul>
+<h3 id="实现考虑"><a href="#实现考虑" class="headerlink" title="实现考虑"></a>实现考虑</h3><h4 id="模型选择："><a href="#模型选择：" class="headerlink" title="模型选择："></a>模型选择：</h4><ul>
+<li>草稿模型通常是主模型的 1&#x2F;4 到 1&#x2F;2 大小</li>
+<li>例如：如果主模型是 70B 参数，草稿模型可能是 7B 或 13B 参数</li>
+</ul>
+<h4 id="预测头数量："><a href="#预测头数量：" class="headerlink" title="预测头数量："></a>预测头数量：</h4><ul>
+<li>语言模型通常使用 3-4 个预测头</li>
+<li>代码模型可以使用 6-8 个预测头</li>
+</ul>
+<h4 id="效率平衡："><a href="#效率平衡：" class="headerlink" title="效率平衡："></a>效率平衡：</h4><ul>
+<li>需要在计算量、内存使用和预测准确性之间找到平衡</li>
+<li>预测头数量增加会带来额外计算开销</li>
+<li>但如果预测准确，可以减少内存访问次数</li>
+</ul>
+<p>这项技术的<strong>主要优势在于它能显著提升模型的推理速度，同时保证输出质量不受影响。它特别适合需要快速响应的生产环境使用。</strong></p>
+
+                            </div>
+
+                            
+                                <section class="post-copyright">
+                                    
+                                        <p class="copyright-item">
+                                            <span>Author:</span>
+                                            <span>yyhappynice</span>
+                                        </p>
+                                        
+                                            
+                                                <p class="copyright-item">
+                                                    <span>Permalink:</span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/09/30/ai-base1/">https://yyhappynice.github.io/2025/09/30/ai-base1/</a></span>
+                                                </p>
+                                                
+                                                    
+                                                        <p class="copyright-item">
+                                                            <span>License:</span>
+                                                            <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                                                        </p>
+                                                        
+                                                            
+                                                                <p class="copyright-item">
+                                                                    <span>Slogan:</span>
+                                                                    <span>Do you believe in <strong>DESTINY</strong>?</span>
+                                                                </p>
+                                                                
+
+                                </section>
+                                
+                                    <section class="post-tags">
+                                        <div>
+                                            <span>Tag(s):</span>
+                                            <span class="tag">
+                                                
+                                                    
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
+                                                        
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
+                                                        
+                                                            
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:window.history.back();">back</a>
+                                            <span>· </span>
+                                            <a href="/">home</a>
+                                        </div>
+                                    </section>
+                                    <section class="post-nav">
+                                        
+                                            <a class="prev" rel="prev" href="/2025/10/12/ai-base2/">LLM 蒸馏 & Transformer</a>
+                                            
+                                                
+                                                    <a class="next" rel="next" href="/2025/09/24/ai-article/">AI 相关文章记录</a>
+                                                    
+                                    </section>
+
+                                    <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxNTk5NTcwNzA=" data-category="Announcements" data-category-id="DIC_kwDOCYjATs4Cwd0z"
+  data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+  data-theme="preferred_color_scheme" data-lang="zh-CN" crossorigin="anonymous" async>
+  </script>
+
+                        </article>
+</div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© yyhappynice | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
