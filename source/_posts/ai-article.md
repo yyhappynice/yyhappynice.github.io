@@ -36,7 +36,12 @@ tags:
 |  **Browser Use 详解**  |  [LINK](https://mp.weixin.qq.com/s/oG69Lim4dBA3VCw4LNvzqQ)  |  -  |
 
 ---
+* [hello-agents](https://github.com/datawhalechina/hello-agents)
+* [AI工作流+工程化闭环](https://my.oschina.net/u/4662964/blog/18348955)
+* [从 Prompt 到上下文工程构建 AI Agent](https://github.com/phodal/build-agent-context-engineering)
+* [happy-llm](https://github.com/datawhalechina/happy-llm)
+* [构筑大语言模型应用：应用开发与架构设计](https://github.com/phodal/aigc)
+* [人工智能相关](https://github.com/karminski/one-small-step)
 
 > 示例
 | 内容4  |  内容5  |  内容6 |
-[AI工作流+工程化闭环](https://my.oschina.net/u/4662964/blog/18348955)
