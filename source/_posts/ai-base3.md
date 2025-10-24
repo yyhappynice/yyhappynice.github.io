@@ -90,7 +90,7 @@ $W_i^Q, W_i^K, W_i^V, W^O$ 是学习到的参数矩阵。
 - **内存/计算开销**：每个头需要独立的 Q/K/V 投影矩阵，参数数量随头数线性增长：
 
   $$
-  \underbrace{3hd_kd_{model}}_{\text{输入投影}} + \underbrace{hd_kd_{model}}_{\text{输出投影}} = 4hd_kd_{model}
+  3hd_kd_{model} \text{ (输入投影)} + hd_kd_{model} \text{ (输出投影)} = 4hd_kd_{model}
   $$
 
   其中：
