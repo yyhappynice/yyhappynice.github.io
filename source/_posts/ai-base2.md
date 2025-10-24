@@ -1,5 +1,5 @@
 ---
-title:  LLM 蒸馏 & Transformer
+title: 蒸馏 & Transformer
 date: 2025-9-18 20:23:09
 categories:
   - ai笔记
