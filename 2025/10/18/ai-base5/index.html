@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="yyhappynice">
+
+
+
+
+
+<title>从 Prompt 到上下文工程构建 Agent | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+<body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `/bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">YuYi&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">YuYi&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+        
+            <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+                
+
+                    
+                        <article class="post-wrap">
+                            <header class="post-header">
+                                <h1 class="post-title">
+                                    从 Prompt 到上下文工程构建 Agent
+                                </h1>
+                                
+                                    <div class="post-meta">
+                                        
+                                            Author: <a itemprop="author" rel="author" href="/">yyhappynice</a>
+                                            
+
+                                                
+                                                    <span class="post-time">
+                                                        Date: <a href="#">October 18, 2025&nbsp;&nbsp;14:38:18</a>
+                                                    </span>
+                                                    
+                                                        
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/ai%E7%AC%94%E8%AE%B0/">ai笔记</a>
+                                                                    
+                                                            </span>
+                                                            
+                                    </div>
+                                    
+                            </header>
+
+                            <div class="post-content">
+                                <blockquote>
+<p><strong>以下学习过程分为四部分：</strong><br><strong>结构化提示词工程</strong> —— 如何工程化设计高效、可复用的提示词。<br><strong>上下文工程与知识检索</strong> —— 知识检索、生成与压缩上下文信息，产生高质量的知识背景。<br><strong>工具函数的系统化设计</strong> —— 设计并实现可供 Agent 调用的工具与接口。<br><strong>Agent 规划与多 Agent</strong> —— 构建任务规划与执行路径，实现闭环自动化。</p>
+</blockquote>
+<h2 id="结构化提示词工程"><a href="#结构化提示词工程" class="headerlink" title="结构化提示词工程"></a>结构化提示词工程</h2><p>尽管 Context Engineering 是一个非常火的词，<u>但是如何写好 Prompt，依然是我们要入门的重点</u>。网上已经有非常多的提示词相关的内容， 但是从我的经验来看，我们可以把重点放在三个部分上：</p>
+<ul>
+<li><strong>提示词输入与输出的结构化</strong></li>
+<li><strong>复杂问题的链式与模块化设计</strong></li>
+<li><strong>提示词路由分发任务</strong></li>
+</ul>
+<p>再配合上一些必要的 AI 框架或者工具，就能非常不错的完成我们的任务。</p>
+<h3 id="提示词输入与输出的结构化"><a href="#提示词输入与输出的结构化" class="headerlink" title="提示词输入与输出的结构化"></a>提示词输入与输出的结构化</h3><p>在现在的开发 Agent 的过程中，尽管模型能生成一部分提示词，但是调提示词依然是工作的重点。我们希望模型输出的内容可以是 JSON、XML 或 Java 类，以便结合其它代码一起使用。</p>
+<blockquote>
+<p>提示词（Prompts）是用于引导 AI 模型生成<strong>特定输出</strong>而输入设计艺术与科学。通过对输入的精心设计与措辞，可以有效影响并控制模型的响应方向与结果， 使 AI 生成符合预期的输出。</p>
+</blockquote>
+<p>我们可以直接看 Spring AI 文档的 Structured Output Converter 作为示例：</p>
+<p><img src="https://github.com/user-attachments/assets/a6c4bc71-6fea-45ec-af9c-9c44fe6b0451" alt="Structured"></p>
+<p>图中的黄色部分即是两个核心：</p>
+<p><strong>格式化的输入指令</strong><br>通常来说，我们需要结构提示词模板来动态生成提示词，采用结构化的文本来设计输入：</p>
+<ul>
+<li><strong>动态提示词模板（PromptTemplate）</strong>。采用经典的模板引擎动态结合上下文，如 LangChain 里的 Jinja2，Spring AI 中的 StringTemplate。这种方式允许在运行时注入上下文、用户输入、系统状态等信息，实现灵活的 Prompt 构建。</li>
+<li><strong>结构化的文本结构</strong>。为了保证 AI 输出的可靠性和可解析性，需要对提示词进行结构化设计，包括角色定位（Role）、任务描述（Task）、 约束条件（Constraints）、输出格式等。</li>
+<li><strong>示例驱动</strong>。通过提供示例输入（Few-shots）与期望输出，可以显著提高模型输出的稳定性和一致性。诸如在实现 QA 的时候会给不同场景的实现示例。</li>
+</ul>
+<p><strong>转换模型输出结果</strong></p>
+<p>即针对不同的场景采用合适的输出格式，并实现对应的解析实现与<strong>异常场景处理。</strong></p>
+<ul>
+<li><strong>领域特定的输出格式</strong>。我们会基于场景的不同，采用 JSON、XML、YAML 或者 Markdown 等不同的设计，以用户体验更好的方式来展示。诸如： JSON 的优点是可直接序列化传输，但是不能实时渲染体验差，不够健壮。YAML 则能更好地处理流式的问题，并且传输成本更低。</li>
+<li><strong>解析实现</strong>。从纯文本中解析出代码块，再进行反序列化与对象映射等处理。使用 Schema 验证（JSON Schema、XSD）确保模型输出字段类型和结构符合约定。</li>
+<li><strong>异常场景处理</strong>。由于模型生成存在不确定性，输出可能存在缺失、类型错误或不符合约定格式的情况。诸如：字段缺失时，使用默认值或回退策略，可触发模型重试生成特定字段</li>
+</ul>
+<p>在能力适当的时候，可以基于已有的数据等信息，微调&#x2F;训练模型来提升在这方面的能力。</p>
+<h3 id="提示词路由分发任务"><a href="#提示词路由分发任务" class="headerlink" title="提示词路由分发任务"></a>提示词路由分发任务</h3><p>在复杂的 AI 系统中，尤其是多 Agent 或多模块协作的场景下，单个提示词往往无法完成所有任务。所以我们需要提示词路由：</p>
+<p><img src="https://github.com/user-attachments/assets/2cc8a7db-aa0b-452a-afc8-977b5f0066d8" alt="router"></p>
+<blockquote>
+<p>提示词路由（Prompt Routing） 是<strong>在多任务、多 Agent 或复杂 AI 流程中，将任务拆分、分析输入并智能分配给最合适模型或子任务提示词的工程化模式。</strong></p>
+</blockquote>
+<p><strong>其核心思想是</strong>：<u>通过分析输入和上下文，动态决定信息处理路径、使用哪条提示词或调用哪个工具、子 Agent，从而实现非线性、条件化的任务执行</u>。以典型的 QA 场景为例：</p>
+<ul>
+<li>非系统相关问题 → 直接告诉用户不支持该种类型的问题</li>
+<li>基础知识问题 → 调用文档检索和 QA 模型</li>
+<li>复杂分析问题 → 调用数据分析工具，再生成总结</li>
+<li>……</li>
+</ul>
+<p>通过提示词路由，系统可以根据问题类型智能选择最合适的处理方式，同时保持模块化和可扩展性。在一些 AI 框架里， 诸如 LangChain 里的 RouterChain 就可以提供类似的能力支持，还有诸如于 <a target="_blank" rel="noopener" href="https://python.langchain.com/docs/how_to/routing/#routing-by-semantic-similarity">Routing by semantic similarity</a> 这种方式。</p>
+<h3 id="复杂问题的链式与模块化设计"><a href="#复杂问题的链式与模块化设计" class="headerlink" title="复杂问题的链式与模块化设计"></a>复杂问题的链式与模块化设计</h3><p>在有提示词路由的前提下，复杂问题可以通过**提示链（Prompt Chaining）**进行系统化拆解。提示链允许将一个大任务拆分为多个子任务， 每个子任务对应不同的提示词或模型调用，最后将结果整合。这种方式比较适合于有固定的流程，并且有一些步骤是可以跳过的。</p>
+<p><img src="https://github.com/user-attachments/assets/6f98007c-9126-486f-8fc4-289a2b87b50f" alt="Chaining"></p>
+<p>这可以实现更好的模块化 设计：</p>
+<ul>
+<li>每一个子任务都专注于处理特定阶段任务</li>
+<li>可以按需重写某个子任务，增加或替换提示词</li>
+<li>根据前一阶段输出动态调整后续提示词</li>
+</ul>
+<p>以常见的软件需求为例，产品经理提出的想法可以通过提示链拆解为：</p>
+<p><img src="https://github.com/user-attachments/assets/b288ee10-eb67-460d-9ae4-e056c28406d7" alt="拆截图"></p>
+<ol>
+<li><strong>创意收集</strong>：收集产品创意与初步需求</li>
+<li><strong>需求逻辑梳理</strong>：理顺需求逻辑和功能优先级</li>
+<li><strong>需求预排期</strong>：形成初步的需求文档或任务列表</li>
+<li><strong>需求定稿</strong>：确认最终需求，生成正式文档</li>
+</ol>
+<p>每个环节可以由不同的提示词或子 Agent 处理。例如，创意收集可借助具备搜索功能的 AI Agent，需求逻辑梳理可使用 Dify、 Copilot 365 等工具完成。最终，各环节按链式流程执行，同时保持模块化设计的灵活性，可根据需要随时调整或替换子任务。</p>
+
+                            </div>
+
+                            
+                                <section class="post-copyright">
+                                    
+                                        <p class="copyright-item">
+                                            <span>Author:</span>
+                                            <span>yyhappynice</span>
+                                        </p>
+                                        
+                                            
+                                                <p class="copyright-item">
+                                                    <span>Permalink:</span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/10/18/ai-base5/">https://yyhappynice.github.io/2025/10/18/ai-base5/</a></span>
+                                                </p>
+                                                
+                                                    
+                                                        <p class="copyright-item">
+                                                            <span>License:</span>
+                                                            <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                                                        </p>
+                                                        
+                                                            
+                                                                <p class="copyright-item">
+                                                                    <span>Slogan:</span>
+                                                                    <span>Do you believe in <strong>DESTINY</strong>?</span>
+                                                                </p>
+                                                                
+
+                                </section>
+                                
+                                    <section class="post-tags">
+                                        <div>
+                                            <span>Tag(s):</span>
+                                            <span class="tag">
+                                                
+                                                    
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
+                                                        
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
+                                                        
+                                                            
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:window.history.back();">back</a>
+                                            <span>· </span>
+                                            <a href="/">home</a>
+                                        </div>
+                                    </section>
+                                    <section class="post-nav">
+                                        
+                                            <a class="prev" rel="prev" href="/2025/11/06/langChainjs1/">LangChainjs 入门&体验(一) 🚧</a>
+                                            
+                                                
+                                                    <a class="next" rel="next" href="/2025/10/12/ai-base4/">LLM 微调技术 & 最佳实践 🚧</a>
+                                                    
+                                    </section>
+
+                                    <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxNTk5NTcwNzA=" data-category="Announcements" data-category-id="DIC_kwDOCYjATs4Cwd0z"
+  data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+  data-theme="preferred_color_scheme" data-lang="zh-CN" crossorigin="anonymous" async>
+  </script>
+
+                        </article>
+</div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© yyhappynice | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

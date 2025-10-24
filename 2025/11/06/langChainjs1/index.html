@@ -13,7 +13,7 @@
 
 
 
-<title>Hello World | Hexo</title>
+<title>LangChainjs 入门&amp;体验(一) 🚧 | Hexo</title>
 
 
 
@@ -180,97 +180,12 @@
                 <div class="container">
     
         
-            <div class="post-toc">
-    <div class="tocbot-list">
-    </div>
-    <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
-    </div>
-</div>
-
-<script>
-    var tocbot_timer;
-    var DEPTH_MAX = 6; // 为 6 时展开所有
-    var tocbot_default_config = {
-        tocSelector: '.tocbot-list',
-        contentSelector: '.post-content',
-        headingSelector: 'h1, h2, h3, h4, h5',
-        orderedList: false,
-        scrollSmooth: true,
-        onClick: extend_click,
-    };
-
-    function extend_click() {
-        clearTimeout(tocbot_timer);
-        tocbot_timer = setTimeout(function () {
-            tocbot.refresh(obj_merge(tocbot_default_config, {
-                hasInnerContainers: true
-            }));
-        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
-    }
-
-    document.ready(function () {
-        console.log('TOC: Document ready, initializing tocbot...');
-        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
-        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
-
-        // 检查内容容器是否存在
-        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
-        console.log('TOC: Content element found:', contentElement);
-
-        if (contentElement) {
-            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
-            console.log('TOC: Found headings:', headings.length);
-
-            try {
-                tocbot.init(obj_merge(tocbot_default_config, {
-                    collapseDepth: 1
-                }));
-                console.log('TOC: tocbot initialized successfully');
-            } catch (error) {
-                console.error('TOC: tocbot initialization failed:', error);
-            }
-        } else {
-            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
-        }
-    });
-
-    function expand_toc() {
-        var b = document.querySelector('.tocbot-toc-expand');
-        var expanded = b.getAttribute('data-expanded');
-        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
-        tocbot.refresh(obj_merge(tocbot_default_config, {
-            collapseDepth: expanded ? 1 : DEPTH_MAX
-        }));
-        b.innerText = expanded ? 'Expand all' : 'Collapse all';
-    }
-
-    function go_top() {
-        window.scrollTo(0, 0);
-    }
-
-    function go_bottom() {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function obj_merge(target, source) {
-        for (var item in source) {
-            if (source.hasOwnProperty(item)) {
-                target[item] = source[item];
-            }
-        }
-        return target;
-    }
-</script>
-                
 
                     
                         <article class="post-wrap">
                             <header class="post-header">
                                 <h1 class="post-title">
-                                    Hello World
+                                    LangChainjs 入门&amp;体验(一) 🚧
                                 </h1>
                                 
                                     <div class="post-meta">
@@ -280,95 +195,23 @@
 
                                                 
                                                     <span class="post-time">
-                                                        Date: <a href="#">September 12, 2025&nbsp;&nbsp;15:04:40</a>
+                                                        Date: <a href="#">November 6, 2025&nbsp;&nbsp;11:10:16</a>
                                                     </span>
                                                     
                                                         
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/LangChainjs/">LangChainjs</a>
+                                                                    
+                                                            </span>
+                                                            
                                     </div>
                                     
                             </header>
 
                             <div class="post-content">
-                                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h4 id="创建草稿"><a href="#创建草稿" class="headerlink" title="创建草稿"></a>创建草稿</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new draft <span class="string">&quot;My Draft Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="发布草稿"><a href="#发布草稿" class="headerlink" title="发布草稿"></a>发布草稿</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo publish <span class="string">&quot;My Draft Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h4 id="本地预览选项"><a href="#本地预览选项" class="headerlink" title="本地预览选项"></a>本地预览选项</h4><ul>
-<li><code>-p</code> 指定端口</li>
-<li><code>-l</code> 只监听本地连接</li>
-<li><code>-o</code> 自动打开浏览器</li>
-</ul>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h4 id="生成选项"><a href="#生成选项" class="headerlink" title="生成选项"></a>生成选项</h4><ul>
-<li><code>-d</code> 生成后立即部署</li>
-<li><code>-w</code> 监听文件变化</li>
-<li><code>-b</code> 生成前清理缓存</li>
-</ul>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<h2 id="高级功能"><a href="#高级功能" class="headerlink" title="高级功能"></a>高级功能</h2><h3 id="插件管理"><a href="#插件管理" class="headerlink" title="插件管理"></a>插件管理</h3><p>Hexo 支持丰富的插件系统</p>
-<h4 id="常用插件"><a href="#常用插件" class="headerlink" title="常用插件"></a>常用插件</h4><ul>
-<li>hexo-generator-feed：RSS 订阅</li>
-<li>hexo-generator-sitemap：站点地图</li>
-<li>hexo-deployer-git：Git 部署</li>
-</ul>
-<h3 id="主题定制"><a href="#主题定制" class="headerlink" title="主题定制"></a>主题定制</h3><p>可以通过修改主题文件来自定义外观</p>
-<h4 id="自定义样式"><a href="#自定义样式" class="headerlink" title="自定义样式"></a>自定义样式</h4><ul>
-<li>修改 CSS 文件</li>
-<li>添加自定义 JavaScript</li>
-<li>调整布局模板</li>
-</ul>
-<hr>
-<hr>
-<div style="text-align: center; color: red;">
-这是居中的红色文字
-</div>
-
-
-<details>
-<summary>点击展开</summary>
-这里是隐藏的内容
-</details>
-
-<p>这是一个脚注<a href="%E8%BF%99%E6%98%AF%E8%84%9A%E6%B3%A8%E7%9A%84%E5%86%85%E5%AE%B9">^1</a></p>
-<blockquote><p>这是一个引用块</p>
-</blockquote>
-
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">hello</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Hello World!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<a href="https://example.com/" title="" target="">链接标题</a>
-
-
-<ul>
-<li><input checked="" disabled="" type="checkbox"> 已完成的任务</li>
-<li><input disabled="" type="checkbox"> 未完成的任务</li>
-<li><input disabled="" type="checkbox"> 另一个任务<table>
-<thead>
-<tr>
-<th align="left">左对齐</th>
-<th align="center">居中对齐</th>
-<th align="right">右对齐</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">内容1</td>
-<td align="center">内容2</td>
-<td align="right">内容3</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-
+                                
                             </div>
 
                             
@@ -382,7 +225,7 @@
                                             
                                                 <p class="copyright-item">
                                                     <span>Permalink:</span>
-                                                    <span><a href="https://yyhappynice.github.io/2025/09/12/hello-world/">https://yyhappynice.github.io/2025/09/12/hello-world/</a></span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/11/06/langChainjs1/">https://yyhappynice.github.io/2025/11/06/langChainjs1/</a></span>
                                                 </p>
                                                 
                                                     
@@ -406,9 +249,9 @@
                                             <span class="tag">
                                                 
                                                     
-                                                        <a href="/tags/%E6%95%99%E7%A8%8B/"># 教程</a>
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
                                                         
-                                                        <a href="/tags/Hexo/"># Hexo</a>
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
                                                         
                                                             
                                             </span>
@@ -421,9 +264,9 @@
                                     </section>
                                     <section class="post-nav">
                                         
-                                            <a class="prev" rel="prev" href="/2025/09/24/ai-article/">AI 相关文章记录</a>
-                                            
                                                 
+                                                    <a class="next" rel="next" href="/2025/10/18/ai-base5/">从 Prompt 到上下文工程构建 Agent</a>
+                                                    
                                     </section>
 
                                     <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
