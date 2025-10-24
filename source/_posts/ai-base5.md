@@ -9,17 +9,20 @@ tags:
 
 ---
 
->**以下学习过程分为四部分：**
->**结构化提示词工程** —— 如何工程化设计高效、可复用的提示词。
->**上下文工程与知识检索** —— 知识检索、生成与压缩上下文信息，产生高质量的知识背景。
->**工具函数的系统化设计** —— 设计并实现可供 Agent 调用的工具与接口。
->**Agent 规划与多 Agent** —— 构建任务规划与执行路径，实现闭环自动化。
+>**Agent 架构综述**：从 Prompt 到上下文工程构建 AI Agent；涵盖结构化提示词、RAG、语义化工具与 MCP、Agent 规划及多 Agent 协作，配套实操方法与参考资料。
+
+以下学习过程分为四部分：
+
+* **结构化提示词工程** —— 如何工程化设计高效、可复用的提示词。
+* **上下文工程与知识检索** —— 知识检索、生成与压缩上下文信息，产生高质量的知识背景。
+* **工具函数的系统化设计** —— 设计并实现可供 Agent 调用的工具与接口。
+* **Agent 规划与多 Agent** —— 构建任务规划与执行路径，实现闭环自动化。
 
 ## 结构化提示词工程
 
 ---
 
-尽管 Context Engineering 是一个非常火的词，<u>但是如何写好 Prompt，依然是我们要入门的重点</u>。网上已经有非常多的提示词相关的内容， 但是从我的经验来看，我们可以把重点放在三个部分上：
+尽管 Context Engineering 是一个非常火的词，但是<u>如何写好 Prompt，依然是我们要入门的重点</u>。网上已经有非常多的提示词相关的内容， 但是从我的经验来看，我们可以把重点放在三个部分上：
 
 * **提示词输入与输出的结构化**
 * **复杂问题的链式与模块化设计**
@@ -76,11 +79,11 @@ tags:
 
 ### 复杂问题的链式与模块化设计
 
-在有提示词路由的前提下，复杂问题可以通过**提示链（Prompt Chaining）**进行系统化拆解。提示链允许将一个大任务拆分为多个子任务， 每个子任务对应不同的提示词或模型调用，最后将结果整合。这种方式比较适合于有固定的流程，并且有一些步骤是可以跳过的。
+在有提示词路由的前提下，复杂问题可以通过**提示链**(**Prompt Chaining**)进行系统化拆解。提示链允许将一个大任务拆分为多个子任务， 每个子任务对应不同的提示词或模型调用，最后将结果整合。这种方式比较适合于有固定的流程，并且有一些步骤是可以跳过的。
 
 ![Chaining](https://github.com/user-attachments/assets/6f98007c-9126-486f-8fc4-289a2b87b50f)
 
-这可以实现更好的模块化 设计：
+这可以实现更好的模块化设计：
 
 * 每一个子任务都专注于处理特定阶段任务
 * 可以按需重写某个子任务，增加或替换提示词
@@ -135,7 +138,7 @@ tags:
 
 ![RAG](https://github.com/user-attachments/assets/acbb20c6-ed66-4cce-944e-285fda0a02e1)
 
->RAG（检索增强生成，Retrieval-Augmented Generation）是构建 Agent 的核心技术之一，**它通过从外部知识库中检索相关信息来增强 大语言模型的生成能力**。在代码库问答等复杂场景中，单纯的向量检索往往不够精准，需要组合多种检索策略来提升准确率。
+>**RAG**（**检索增强生成**，Retrieval-Augmented Generation）是构建 Agent 的核心技术之一，**它通过从外部知识库中检索相关信息来增强 大语言模型的生成能力**。在代码库问答等复杂场景中，单纯的向量检索往往不够精准，需要组合多种检索策略来提升准确率。
 
 简单来说，就是通过搜索来丰富上下文。根据实现复杂度和场景需求，我们可以将检索策略分为以下几类：
 
@@ -154,7 +157,7 @@ tags:
 而在检索之前，为了确保生成的检索结果可靠，需要引入**查询改写（Query Rewriting）**，即将用户的模糊意图逐步转化为数据库能够高效执行的精确查询。 <u>修改用户的原始查询来提升其与知识库中文档的相关性，解决了自然语言问题与存储数据块之间的“阻抗不匹配”问题 。</u>
 
 **代码场景下的 RAG 示例：**
-通常来说，多种不同的检索策略可以组合使用，以提升检索效果。如下是向量数据库 LanceDB 官方给的一个[Codebase RAG 实现](https://blog.lancedb.com/rag-codebase-1/)：
+通常来说，多种不同的检索策略可以组合使用，以提升检索效果。如下是向量数据库 LanceDB 官方给的一个 [Codebase RAG 实现](https://blog.lancedb.com/rag-codebase-1/)：
 
 ![Codebase-RAG](https://github.com/user-attachments/assets/8cee6078-a96d-443c-9b62-81999a0cc90f)
 
@@ -171,7 +174,7 @@ tags:
 
 ![window](https://github.com/user-attachments/assets/eb3d3ddd-b46f-4fac-b94a-111f1783a366)
 
-两年前，GitHub Copilot 为补全为构建的上下文系统是业内 最值得研究的上下文系统（没有之一）：
+两年前，[GitHub Copilot](https://code.visualstudio.com/docs/copilot/guides/prompt-engineering-guide) 为补全为构建的上下文系统是业内 最值得研究的上下文系统（没有之一）：
 
 * **持续的信号监控**。Copilot 插件会持续监控来自 IDE 的一系列信号，以动态调整上下文的优先级。诸如于插入或删除字符、当前编辑的文件和语言的改变，光标移动、滚动位置变化、文件的打开与关闭。
 * **上下文来源的[优先级排序](https://github.com/mengjian-github/copilot-analysis)**。在发给模型的最终提示词里，会根据优化级来进行排序和筛选：
@@ -193,7 +196,7 @@ tags:
 
 ![Agentic](https://github.com/user-attachments/assets/bca79338-5042-40eb-88af-b1f782de2b80)
 
->Agentic 指的是一种让 AI 系统具备 自主感知、动态决策与目标导向执行能力 的特性，使其能够在任务过程中主动优化上下文、生成检索策略并持续自我迭代。
+>Agentic 指的是一种让 <u>AI 系统具备 自主感知、动态决策与目标导向执行能力的特性，使其能够在任务过程中主动优化上下文、生成检索策略并持续自我迭代</u>。
 
 在 AI Coding 领域，诸如 Cursor、Claude Code 等，我们可以观察其运行的过程，**其本质是 Agent 来执行 RAG**。它与普通的 RAG 相比，它更加容易拿到 丰富的上下文，进而确保上下文在整个过程中是不缺失的。我们可以看到现有比较成熟的一些 AI 应用的示例：
 
@@ -310,7 +313,7 @@ Agent 是目标为导向的，为了实现目标通常情况下需要**感知-�
 
 ### 模块化的系统提示词：Agent 的思维蓝图
 
-构建一个有效的 Agent 的第一步，是定义它的“思维蓝图”——即系统提示词（System Prompt）。优秀的系统提示词设计不仅定义了 Agent 应该做什么，也明确了不应该做什么。在 Coding Agent 领域，一个 Agent 的系统提示词往往极为复杂。例如 Cursor 的系统提示词中，包含了关于角色、工具调用、安全边界、任务规划等详细规范。
+构建一个有效的 Agent 的第一步，是定义它的“思维蓝图”——即系统提示词（System Prompt）。优秀的系统提示词设计不仅定义了 Agent 应该做什么，也明确了不应该做什么。在 Coding Agent 领域，一个 Agent 的系统提示词往往极为复杂。例如 [Cursor 的系统提示词](https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/blob/main/Cursor%20Prompts/Agent%20Prompt%202025-09-03.txt)中，包含了关于角色、工具调用、安全边界、任务规划等详细规范。
 
 结合 Cursor、Claude Code、Augment、Junie 等工具，我们可以总结出一系列模块化设计实践：
 
@@ -373,21 +376,10 @@ Agent 是目标为导向的，为了实现目标通常情况下需要**感知-�
 
 对于记忆而言，应该根据新近度、相关性和重要性对记忆进行加权检索的机制，以及能够自主决定记住什么、忘记什么以及如何组织信息的反思性记忆管理系统 。
 
->一个先进 Agent 架构的最终目标，**是创建一个自我强化的飞轮：行动产生经验，反思将经验提炼为知识，记忆存储知识以改进未来的行动**。这将 Agent 从一个静态的程序，转变为一个动态的学习实体。
+>一个先进 Agent 架构的最终目标：**创建一个自我强化的飞轮：行动产生经验，反思将经验提炼为知识，记忆存储知识以改进未来的行动**。这将 Agent 从一个静态的程序，转变为一个动态的学习实体。
 
 ## 小结
 
 >系统提示词（System Prompt）在 Agent 系统中的地位，远超一份简单的指令集；**它实际上是 Agent 的核心“操作系统”，需要以系统架构设计的高度来对待提示词和上下文工程。**
 
 <u>利用 Markdown 或 XML 等标记语言来构建结构化的指令模块，可以显著提高 LLM 对复杂规则的理解和遵循能力</u>。 通过明确的角色激活、详尽的行为规范、以及“即时”加载数据等上下文工程技术，开发者可以为 Agent 塑造一个稳定、可预测的“认知环境”， 从而将其行为引导至期望的轨道上。<u>优秀的上下文工程是实现 Agent 行为可靠性的基础。</u>
-
-<!-- 相关资源：
-
-* https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
-* Agentic Design Patterns： https://docs.google.com/document/d/1rsaK53T3Lg5KoGwvf8ukOUvbELRtH-V0LnOIFDxBryE/edit?tab=t.0
-* Agentic Context Engineering: https://www.arxiv.org/pdf/2510.04618
-* A Survey on Large Language Model based Autonomous Agents: https://arxiv.org/pdf/2308.11432
-* Effective context engineering for AI agents
-* AGENTIC RETRIEVAL-AUGMENTED GENERATION: A SURVEY ON AGENTIC RAG
-* How to build reliable AI workflows with agentic primitives and context engineering -->
-
