@@ -799,6 +799,9 @@ header .menu label {
 .post-content ul {
   padding-left: 2em;
 }
+.post-content ul li {
+  word-break: break-all;
+}
 .post-content table {
   max-width: 100%;
   margin: 10px 0;
