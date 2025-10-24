@@ -360,7 +360,9 @@
 <p>总的来说, Flash Attention 是一种强大的工具, 能够在不牺牲性能的情况下提高模型的效率, 但在实现和使用时需要考虑其复杂性和硬件要求.</p>
 <h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p><img src="https://github.com/user-attachments/assets/5b18e7cf-8bee-461f-bf56-135211a43ea1" alt="性能"></p>
 <p>当使用 H100 显卡且序列长度是512时（数据来自论文测试），PyTorch 的标准处理速度是 62 Tflops，而 Flash Attention 则可以达到 157 Tflops，Flash Attention 2 则可以达到215 Tflops。在 FP16&#x2F;BF16 精度下，实际加速比可达标准实现的 3-4 倍。</p>
-<h2 id="什么是-Multi-Head-Attention"><a href="#什么是-Multi-Head-Attention" class="headerlink" title="什么是 Multi-Head Attention?"></a>什么是 Multi-Head Attention?</h2><p>多头注意力（Multi-Head Attention）是 Transformer 架构中的一个核心组件，它通过并行运行多个注意力机制来增强模型的性能。</p>
+<h2 id="什么是-Multi-Head-Attention"><a href="#什么是-Multi-Head-Attention" class="headerlink" title="什么是 Multi-Head Attention?"></a>什么是 Multi-Head Attention?</h2><blockquote>
+<p>多头注意力（Multi-Head Attention）是 Transformer 架构中的一个核心组件，它通过并行运行多个注意力机制来增强模型的性能。</p>
+</blockquote>
 <p>在多头注意力机制中，”头”是指一个独立的注意力机制。每个头有自己的一组权重，用于计算输入的自注意力。通过使用多个头，模型可以从不同的角度和特征空间中提取信息。</p>
 <p><img src="https://github.com/user-attachments/assets/71ebb120-fbf2-476a-a458-12dd962c5d7c" alt="Multi-Head"></p>
 <h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><p>首先我们来看注意力公式, 给定输入向量 $Q$（查询）、$K$（键）和 $V$（值），注意力机制的计算公式为：</p>
@@ -498,7 +500,9 @@
 <td>生产环境部署</td>
 </tr>
 </tbody></table>
-<h2 id="什么是-Grouped-Query-Attention"><a href="#什么是-Grouped-Query-Attention" class="headerlink" title="什么是 Grouped-Query Attention?"></a>什么是 Grouped-Query Attention?</h2><p>Grouped-Query Attention（分组查询注意力）是 Transformer 架构的改进型注意力机制，在多头注意力（MHA）和多查询注意力（MQA）之间取得平衡。通过分组共享键值投影，在保持模型容量的同时显著降低计算资源消耗。</p>
+<h2 id="什么是-Grouped-Query-Attention"><a href="#什么是-Grouped-Query-Attention" class="headerlink" title="什么是 Grouped-Query Attention?"></a>什么是 Grouped-Query Attention?</h2><blockquote>
+<p>Grouped-Query Attention（分组查询注意力）是 Transformer 架构的改进型注意力机制，在多头注意力（MHA）和多查询注意力（MQA）之间取得平衡。通过分组共享键值投影，在保持模型容量的同时显著降低计算资源消耗。</p>
+</blockquote>
 <p><img src="https://github.com/user-attachments/assets/f6dceb73-8d38-41a0-8927-6194972e2b7e" alt="Grouped-Query"></p>
 <h3 id="工作原理-2"><a href="#工作原理-2" class="headerlink" title="工作原理"></a>工作原理</h3><p>在标准多头注意力基础上进行关键修改：所有注意力头共享同一组键（K）和值（V）的投影矩阵，仅保留查询（Q）的独立投影。公式如下：</p>
 <p>$$<br>\text{MultiQuery}(Q, K, V) &#x3D; \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O<br>$$</p>
