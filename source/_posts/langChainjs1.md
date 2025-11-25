@@ -86,6 +86,7 @@ LangChain是2022年10月（ChatGPT在2022年11月30问世，比ChatGPT还早）�
 
 LangChain是由多个包组成的框架：
 
+![Image](https://github.com/user-attachments/assets/12608792-a56d-4573-aa4a-c7e3ac092e10)
 
 图中展示了LangChain（V0.3版本）生态系统的主要组件及其分类，分为三个层次：**架构**(Architecture)、**组件**(Components)和**部署**(Deployment)。
 
@@ -95,3 +96,54 @@ LangChain是由多个包组成的框架：
 2. langchain-community：第三方集成，⽐如：Model I/O、Retrieval、Tool等。
 3. langchain-Core：基础抽象和LangChain表达式语言 (LCEL)
 
+**结构2：LangGraph**：基于有向图+条件边来灵活的构建多智能体应用，提供了条件分支、循环、并行等复杂控制流，能够实现状态持久化、断点续跑、时间旅行、人机协作等高级功能。
+
+**结构3：LangSmith**：用于构建、调试、测试、评估、监控和链路追踪大模型应用程序，提供了6大功能，涉及Debugging (调试)、Playground (沙盒)、Prompt Management (提示管理)、Annotation (注释)、Testing (测试)、Monitoring (监控)等。与LangChain无缝集成，从原型阶段过渡到生产阶段。
+
+**结构4：LangServe**：将基于 LangChain 开发的链（Chain）、代理（Agent）等快速部署为 REST API 服务。它基于 FastAPI 构建，极大简化了 AI 应用服务化的流程
+
+**LangChain当中，目前最火的两个模块就是：LangGraph，LangSmith。**
+
+### 1.4 LangChain核心组件
+
+LangChain提供了一个高度模块化且可组合的框架，开发者能通过灵活集成其六大核心组件，来构建功能复杂的大模型应用。
+
+![Image](https://github.com/user-attachments/assets/2f323fe4-3e05-4cc3-b0eb-d4836680596c)
+
+1. **Model I/O（模型交互标准化接口）**：提供统一的模型交互接口，封装提示模板调用、模型推理与输出解析，实现不同大语言模型输入的标准化与输出的结构化处理
+
+2. **Chains（链）**：用于链式工作流编排，将多个模块串联起来组成一个完整的流程，例如，一个 Chain 可能包括一个 Prompt 模板、一个大模型和一个输出解析器，它们协同工作，处理用户输入并返回结果。
+
+3. **Memory（记忆）**：用于保存历史对话和上下文信息，以便在后续对话中使用，从而实现有状态的对话。
+
+4. **Agents（智能体）**：自主决策并调用工具，赋予大模型行动能力
+
+5. **Retrieval（检索，RAG核心）**：从大量的文档或数据源中查找相关信息的核心模块，是构建RAG（检索增强生成）的基础
+
+6. **Callbacks（保障应用可观测性）**：回调机制，允许连接到 LLM 应用程序的各个阶段，可以监控和分析LangChain的运行情况，比如日志记录、监控、流传输等，以优化性能。
+
+**后续章节将详细介绍以上组件的使用方式。**
+
+## 2. LangChain使用之环境准备
+
+### 2.1 安装LangChain
+
+LangChain基于Python开发，因此需确保系统中安装了Python环境。
+
+**安装LangChain**
+
+```python
+方式一：pip install langchain
+方式二：conda install langchain
+```
+
+### 2.2 简单demo
+
+```
+chat_model = ChatOpenAI(
+    model_name=model_name,
+    base_url=base_url,  # 与模型交互的地址
+    api_key=api_key,  # 秘钥
+    temperature=0.7   # 温度参数,控制生成文本的随机性
+)
+```
