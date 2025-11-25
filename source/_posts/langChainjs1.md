@@ -132,18 +132,137 @@ LangChain基于Python开发，因此需确保系统中安装了Python环境。
 
 **安装LangChain**
 
-```python
+```py
 方式一：pip install langchain
 方式二：conda install langchain
 ```
 
 ### 2.2 简单demo
 
+```py
+chat_model = ChatOpenAI(
+  model_name=model_name,
+  base_url=base_url,  # 与模型交互的地址
+  api_key=api_key,  # 秘钥
+  temperature=0.7   # 温度参数,控制生成文本的随机性
+)
 ```
+
+## LangChain核心组件之Model I/O
+
+### 3.1 Model I/O
+
+Model I/O 是应用程序与大模型进行交互的组件，**它与大模型的关系类似于JDBC与数据库的关系**，本质上都是**为了解耦应用逻辑与底层实现，提供标准化的交互接口**，使应用程序无需关注大模型底层的实现，可与各种大模型进行交互。Model I/O 包括输入**提示(Format)**、**调用模型(Predict)**、**输出解析(Parse)**。分别对应着Prompt Template（提示词模版），Model （大模型）和Output Parser（输出解析器）。
+
+![Image](https://github.com/user-attachments/assets/b2b7a276-4dc6-4496-9199-7a7303543e4c)
+
+说白了，Model I/O 就是LangChain 提供了一系列与大模型交互的API。
+
+### 3.2 大模型分类（按功能）
+
+**1、LLMs（大语言模型）**
+
+也叫非对话模型，**是许多语言模型应用程序的支柱**，通用的文本生成，能够完成一次性的文本生成任务，如写作、翻译等。
+
+```py
+llm_model = OpenAI()
+llm_model.invoke("什么是LangChain?")
+```
+
+**2、Chat Models（对话模型）**
+
+专门为**多轮对话场景**优化的语言模型。与LLMs处理纯字符串不同，Chat Models的输入和输出都是**结构化的消息对象**，能更好地理解和维护对话的上下文。
+
+```py
+# 创建ChatOpenAI模型实例
+chat_model = ChatOpenAI(
+  model_name=model_name,
+  base_url=base_url,  # 与模型交互的地址
+  api_key=api_key,  # 秘钥
+  temperature=0.7   # 温度参数,控制生成文本的随机性
+)
+
+# 调用模型
+response = chat_model.invoke("用简单一句话概括一下什么是反洗钱？")
+# 打印模型响应内容
+print(response)
+```
+
+**3、Embedding Model（嵌入模型）**
+
+它的核心任务是**将文字、图片等非结构化数据，转换成高维空间中的数值向量**。并且能够将**语义相近的内容在向量空间中的位置也映射得更近。**
+
+```py
+# 我这里使用的嵌入模型是自己本地部署的，OpenAI的类为OpenAIEmbeddings
+embeddings_model = OllamaEmbeddings(
+    model="nomic-embed-text",
+    base_url="http://127.0.0.1:11434",
+)
+vector = embeddings_model.embed_query("hello world")
+print(f"嵌入向量长度: {len(vector)}")
+print(f"前20个值: {vector[:20]}")
+```
+
+### 3.3 Message（消息）
+
+消息是对话模型中通信的基本单位，用于表示与模型通讯的输入与输出，以及包含与对话相关的上下文信息和元数据，每一条消息都包含一个角色（系统、用户、AI等）和内容（用户的输入或模型的输出）以及其他元信息（id、名称、令牌使用情况等），LangChain提供了一个统一的消息格式，可以在不同模型之间使用。
+
+**1、SystemMessage（系统消息）**：设定行为准则，用于定义大模型的角色、运行规则、环境信息等。如果模型不支持SystemMessage则LangChain会将消息合并到HumanMessage中一起发送给大模型。
+
+**2、HumanMessage（用户消息）**：用户的输入，用户向模型发出的提问或指令。
+
+**3、AIMessage（大模型消息，一般是模型返回的结果）**：大模型的输出，这是大模型对HumanMessage和SystemMessage的响应。它不仅包含生成的文本内容（content属性），还可能包含以下结构化信息（外部工具、调用令牌使用情况等元数据）。
+
+**4、ToolMessage/ FunctionMessage**：连接外部能力，向模型传递外部工具或函数调用的执行结果，常用于Agent调用tool。
+
+```py
 chat_model = ChatOpenAI(
     model_name=model_name,
     base_url=base_url,  # 与模型交互的地址
-    api_key=api_key,  # 秘钥
-    temperature=0.7   # 温度参数,控制生成文本的随机性
+    api_key=api_key  # 秘钥
 )
+messages = [
+    # 创建系统消息，定义模型的角色
+    SystemMessage(content="我是反洗钱领域的专家，我叫RiskHelper"),      # 创建用户消息，用户的提问
+    HumanMessage(content="你好，什么是反洗钱？")
+]
+# 返回的类型是AI大模型消息
+response = chat_model.invoke(messages)
+print(type(response)) # 格式是AIMessage
+```
+
+### 3.4 Prompt Template（提示词模版）
+
+**Prompt（提示词）**：提示词是与大模型交互时输入的内容，**用来指导大模型生成特定类型的回答或执行特定的任务**。它可以是一个简单的问题、一段详细的任务说明，或包含角色、背景、示例的复杂文本。其核心目的是**约束行为，减少错误，引导模型生成用户期望的响应**。好的提示词可以解决60%以上的模型幻觉问题，优化提示词也是我们后续开发中解决大模型幻觉最多且最有效的方式之一。
+
+如下是一个简单的提示词：
+```py
+"""
+您是一名资深LangChain框架专家，具备以下专业背景：
+- 精通LangChain 0.3.x及以上版本的核心架构
+- 熟练掌握Models、Prompts、Chains、Agents、Memory五大组件
+- 拥有实际企业级LLM应用部署经验
+
+请根据用户需求提供：
+1. 架构设计建议（组件选型与组合逻辑）
+2. 代码实现方案（包含最佳实践）
+3. 性能优化策略（处理长文本/高并发场景）
+4. 错误排查指导（常见陷阱与解决方案）用户输入: {input}
+"""
+```
+
+**Prompt Template（提示词模版）**：固定的提示词限制了模型的灵活性和适用范围，所以 Prompt Template 是一个模板化的字符串，**可以将变量（如用户提问等）插入到模板的占位符中**，从而创建出不同的提示。LangChain提供了很多提示词模版，用于与大模型交互，常见的提示词模版如下：
+
+**1、PromptTemplate**：LLM提示模板，用于生成字符串提示，生成的是单一、无角色区分的纯文本字符串。
+
+```py
+# 创建PromptTemplate
+prompt_template = PromptTemplate(
+    template="如何成为一个{domain}领域的专家",
+    input_variables=["domain"]
+)
+# 填充模版参数，将反洗钱填充到domain字段中
+messages = prompt_template.invoke({"domain": "反洗钱"})
+response = chat_model.invoke(messages)
+print(response.content)
 ```
