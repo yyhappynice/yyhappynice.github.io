@@ -115,7 +115,7 @@ tags:
 >上下文工程是一门将不断变化的信息宇宙中最相关内容，精心筛选并放入有限上下文窗口的艺术与科学。
 
 ### 上下文窗口
-简单来说：关注在有限的上下文窗口中挑选最关键的信息，让模型理解和推理更高效。如下是 [Langchain 绘制](https://github.com/langchain-ai/how_to_fix_your_context)的 [Drew Breunig 的总结](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html) 的 6 种常见上下文工程技术：
+简单来说：关注在有限的上下文窗口中挑选最关键的信息，让模型理解和推理更高效。如下是 [Langchain 绘制](https://github.com/langchain-ai/how_to_fix_your_context) 的 [Drew Breunig 的总结](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html) 的 6 种常见上下文工程技术：
 
 ![上下文工程](https://github.com/user-attachments/assets/0a1d9a99-7c3a-4099-a591-395c41805f66)
 
