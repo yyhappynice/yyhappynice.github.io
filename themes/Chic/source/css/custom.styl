@@ -2,3 +2,44 @@
 // Custom style
 // ==============================
 //  Also You can override the variables in variable.styl to customize the style
+
+// 正文样式修改
+.post-content
+  table
+    thead
+      background: rgba(0, 82, 255, 0.9)
+      color: #fff
+  h3
+    position: relative
+    display: block
+    color: rgb(0, 82, 255)
+    &::before
+      content: ''
+      position: absolute
+      left: -6px
+      top: 68%
+      transform: translateY(-68%)
+      width: 6px
+      height: 28px
+      background: rgb(255, 218, 169)
+
+
+    &::after
+      content: ''
+      position: absolute
+      left: -12px
+      top: 68%
+      transform: translateY(-68%)
+      width: 6px
+      height: 28px
+      background: rgb(0, 82, 255)
+
+    a
+      padding-left: 10px
+
+  ol
+    padding-left: 30px
+    li::marker
+      font-weight: 500
+      font-style: italic
+
