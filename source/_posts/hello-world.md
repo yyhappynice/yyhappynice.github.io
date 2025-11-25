@@ -28,6 +28,87 @@ $ hexo new draft "My Draft Post"
 $ hexo publish "My Draft Post"
 ```
 
+```js
+
+class myPromise {
+  constructor(Fn) {
+    if(Object.prototype.toString.call(Fn) !== '[object Function]') { /*传入必须为function*/
+      throw new TypeError('Pass function object to create a Promise object')
+    }
+
+    this.status = "pending" /*初始化状态*/
+    this.promiseResolvedArray = [] /*Promise resolve时的回调数组*/
+    this.promiseRejectedArray = [] /*Promise reject时的回调数组*/
+
+    this.onResolve = this.onResolve.bind(this)
+    this.onReject = this.onReject.bind(this)
+    Fn(this.onResolve, this.onReject)
+  }
+
+  then(onResolve, onReject) {
+    console.log()
+    this.promiseResolvedArray.push(onResolve)
+    this.promiseRejectedArray.push(onReject || null)
+    return this
+  }
+
+  catch(onReject) {
+    return this.then(null, onReject)
+  }
+
+  onResolve(value) {
+    if(this.status === 'pending') {
+      this.status = 'resolved'
+    } else {
+      throw new TypeError('You have to use pending state to convert')
+    }
+
+    let storedValue = value
+
+    try {
+      this.promiseResolvedArray.forEach((nextFunction) => {
+        storedValue = nextFunction(storedValue)
+      })
+    } catch (error) {
+      throw new TypeError(error)
+    }
+  }
+
+  onReject(error) {
+    if(this.status === 'pending') {
+      this.status = 'rejected'
+    } else {
+      throw new TypeError(error)
+    }
+
+    let storedValue = error
+
+    try {
+      this.promiseRejectedArray.forEach((nextFunction) => {
+        storedValue = nextFunction(storedValue)
+      })
+    } catch (error) {
+      throw new TypeError(error)
+    }
+  }
+}
+
+var p = function (){
+    return new myPromise(function(resolve, reject){
+        setTimeout(function(){
+          reject('p 的结果')
+        }, 100);
+    });
+}
+
+p().then(function(data) {
+  console.log('resolve: ' + data)
+}, function(data) {
+  console.log('reject: ' + data )
+})
+
+```
+
 ### Run server
 
 ``` bash
