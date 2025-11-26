@@ -731,3 +731,216 @@ LangChain中的Tool 和 MCP Server比较：
 | 更新维护      | 修改需重新编译 Agent    | 修改需重新编译 Agent 独立更新 |
 | 性能         | 本地调用，极快    | 需要网络/IPC通信 |
 | 适用场景      | 简单、专用工具    | 通用、复杂工具 |
+
+## 7. LangChain核心组件之Agent
+
+### 7.1 Agent（智能体）概述
+
+![Image](https://github.com/user-attachments/assets/8df80891-6f0f-4a59-b3be-a90d91adc4e2)
+
+Agent（智能体）是一个通过动态协调大模型（LLM）和 工具（Tools）来完成复杂任务的智能系统（思考、分析、拆解任务、逐步实现）。**它让大模型充当"决策大脑"，根据用户输入自主选择和执行工具**（如搜索、计算、数据库查询等），最终生成精准的响应。2025年也被称为Agent元年，**标志着人工智能正式从“思考与对话” 转向 “自主决策与行动”。**
+
+一个Agent应该具备以下核心能力：
+
+![Image](https://github.com/user-attachments/assets/3b2daa77-95c3-4e8a-9e94-192305396518)
+
+1. **大模型（LLM）**：作为大脑，提供推理、知识理解和逻辑判断能力。
+2. **记忆（Memory）**：用于保持Agent的上下文信息，具备短期记忆（上下文）和长期记忆（向量存储），支持快速知识检索。使交互具有连续性。
+3. **工具（Tools）**：扩展Agent的能力边界，通过调用外部工具（搜索、数据库等）Agent可以获取实时信息，弥补自身的功能局限性。
+4. **规划（Planning）**：将具体的任务分解，并具备反思和调整能力，当效果不符合预期时，能够重新规划方案并执行，确保目标最终实现。
+5. **行动（Action）**：实际执行决策的能力。比如：检索、推理、编程
+6. **协作（cooperation）**：单一的Agent功能通常是有限的，而复杂问题往往需要不同的专业知识的Agent协同解决，不同Agent之间通过A2A协议交互。
+
+**通用人工智能（AGI）将是AI的终极形态（这天是否会到来？不止是技术的突破，还有伦理、法律、社会认知等）。同样，构建智能体（Agent）则是AI工程应用当下的“终极形态”。**
+
+![Image](https://github.com/user-attachments/assets/3ea4a9a7-b623-45bc-9cb8-9cad52e8483c)
+
+### 7.2 Agent Types（运行模式）
+
+在 LangChain 中，Agent是一种由大模型驱动的组件，能够根据用户的输入动态决定执行哪些操作（如调用工具、访问数据等）。不同的 Agent 类型对应不同的决策逻辑和策略，适用于不同的任务场景。
+
+**1、Function Calling**：是让LLM学会“使用工具”。预先定义好一系列函数（如get_weather， search_web），并明确描述它们的功能和参数。当用户提问时，将用户提问以及工具信息（工具描述、参数等关键信息）一起发送给大模型，**大模型不直接生成答案，而是判断是否需要调用这些函数，以及如何调用，并将函数参数，函数名等信息以结构化的格式返回**（如JSON格式）。
+
+a. 关键点：LLM本身不执行函数代码，它只负责规划。实际执行由Agent完成 。
+b. 应用场景：适合用于获取实时数据（天气、股价）、查询数据库、执行计算或调用任何外部API等
+
+```py
+"""
+OpenAI函数调用Agent
+特点：1、使用OpenAI的函数调用功能，支持结构化工具调用 2、性能最佳，响应速度快，工具调用准确性高 3、支持并行工具调用，可同时执行多个工具 4、原生支持JSON格式的参数传递
+适用场景：1、需要高精度工具调用的应用 2、对响应速度有要求的生产环境 3、需要复杂参数传递的工具集成 4、推荐作为首选Agent类型
+"""
+AgentType.OPENAI_FUNCTIONS
+
+"""
+OpenAI多函数调用Agent - 高级功能
+特点：1、支持复杂的多步骤工具调用链 2、能够处理工具间的依赖关系 3、支持条件分支和循环调用 4、具备更强的推理和规划能力
+适用场景： 1、需要多步骤复杂任务处理 2、工具间存在依赖关系的场景 3、需要动态决策和分支处理 4、复杂的业务流程自动化
+"""
+AgentType.OPENAIMULTI_FUNCTIONS
+```
+
+**2、ReAct模式（思考与行动）**
+
+![Image](https://github.com/user-attachments/assets/68844d0f-c9be-410e-ac73-3206122fa3f2)
+
+将复杂任务拆解成，**Thought (推理) → Action (行动，即调用工具) → Observation (观察结果) → ... → Final Answer（最终答案）**的循环步骤：
+
+
+a. **Thought（思考）**：大模型首先会分析当前情况，并思考下一步应该做什么以及为什么这么做。
+
+b. **Action（行动）**：根据思考的结果，判断是否需要调用工具，以及调用哪个工具，并生成相应的调用参数，发起工具调用。
+
+c. **Observation（观察）**：查看工具执行的结果，判断是否成功等。如调用写文件工具，会判断文件是否写入成功。
+
+d. **Final Answer（最终答案）**：如果任务已经成功或达到执行次数，则会生成最终答案，否则继续进行“思考-行动-观察”循环步骤。
+
+ReAct的工作原理：**大模型本身不具备此流程（Thought-Action-Observation），实际是根据预先设定好的系统提示词来执行上述步骤的**，如下是一个ReAct的系统提示词（hwchase17/react）：
+
+![Image](https://github.com/user-attachments/assets/38bc5944-fff0-46b6-b6f8-4a56b8c615d3)
+
+LangChain中ReAct的类型：
+
+```py
+"""
+零样本ReAct描述Agent
+特点：1、基于ReAct（Reasoning + Acting）模式 2、通过"思考-行动-观察"的循环进行推理 3、不需要示例，完全依赖工具描述 4、具有良好的可解释性和透明度
+适用场景：1、需要清晰推理过程的应用 2、工具描述详细且准确的场景 3、对可解释性有要求的业务场景 4、适合调试和问题排查
+"""
+AgentType.ZERO_SHOT_REACT_DESCRIPTION
+
+"""
+结构化聊天零样本ReAct Agent
+特点：1、结合了结构化输出和ReAct推理模式 2、支持更复杂的工具参数传递 3、具备更好的多轮对话能力 4、输出格式更加规范和可解析
+适用场景：1、需要结构化输出的聊天应用 2、复杂参数的工具调用场景 3、多轮对话中的工具使用 4、需要格式化响应的业务场景
+"""
+AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION
+
+"""
+对话式ReAct Agent
+特点：1、具备对话记忆能力，能记住历史交互 2、基于ReAct模式进行推理和行动 3、支持上下文相关的工具调用 4、适合长期对话和任务跟踪
+适用场景：1、需要维护对话状态的应用 2、长期任务跟踪和管理 3、个性化服务和推荐 4、客户服务和技术支持场景
+"""
+AgentType.CONVERSATIONAL_REACT_DESCRIPTION
+```
+
+### 7.3 ReAct Agent 结合大模型使用
+
+```py
+
+# 创建Tavily搜索工具实例，用于为Agent提供实时网络搜索能力
+# 需要在https://tavily.com/ 申请API key 才能使用
+search_tool = TavilySearchResults(
+    max_results=3,
+    description="用于搜索最新网页信息、新闻和历史数据。输入应该是明确的搜索查询。"
+)
+# 从LangChain Hub拉取预定义的ReAct提示词模板
+prompt = hub.pull("hwchase17/react")
+# 创建ReAct Agent实例
+agent = create_react_agent(
+    llm=chat_model,
+    prompt=prompt,
+    tools=[search_tool]
+)
+# 创建Agent执行器
+agent_executor = AgentExecutor(
+    agent=agent,
+    handle_parsing_errors=True,  # 自动处理解析错误，提高稳定性
+    verbose=True,                # 开启详细日志，显示推理过程
+    tools=[search_tool]          # 工具列表，必须与Agent中的工具保持一致
+)
+# 执行Agent任务
+response = agent_executor.invoke( {"input": "2021年2月5日腾讯收盘价是多少？"})
+print(response)
+```
+
+![Image](https://github.com/user-attachments/assets/f32433ce-4ddc-4182-845f-879134d7b83a)
+
+### 7.4 FUNCTION_CALL 结合大模型、Memory 使用
+
+```py
+# 创建Tavily搜索工具实例
+search_tool = TavilySearchResults(
+    max_results=3, # 限制搜索结果数量，平衡信息完整性和处理效率
+    description="用于搜索最新网页信息、新闻和历史数据。输入应该是明确的搜索查询。"
+)
+# 定义工具列表，可以添加多个
+tools = [search_tool]
+# 创建提示词模板
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "你是一个人工智能小助手，可以回答问题并使用工具。"),
+    ("placeholder", "{chat_history}"),
+    ("human", "{input}"),
+    ("placeholder", "{agent_scratchpad}")
+])
+# 创建对话缓冲记忆实例
+memory = ConversationBufferMemory(
+    memory_key="chat_history",
+    return_messages=True
+)
+# 创建工具调用Agent实例
+agent = create_tool_calling_agent(chat_model, tools, prompt)
+# 创建Agent执行器
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    memory=memory,
+    handle_parsing_errors=True,
+    verbose=True
+)
+response = agent_executor.invoke({"input": "2021年2月5日腾讯收盘价是多少？"})
+print(response)
+response = agent_executor.invoke({"input": "阿里呢？"})
+# 嵌入Memory，可以推断出问的股价，
+print(response)
+```
+
+![Image](https://github.com/user-attachments/assets/f935b6ba-b759-4029-b2c4-62c2660e1e02)
+
+## 8. LangChain核心组件之Retrieval
+
+
+## 9. 再谈LangChain
+
+到这想必对LangChain有一个清晰的认识了，为了更形象地理解，如果将LLM比作人类的”大脑“，那么LangChain中的组件就像：
+
+
+1. **LLM（大语言模型） ——  大脑**
+
+整个系统的核心，负责思考、推理、理解和生成。就像人类的大脑，是智能的中枢。它接收来自各方的信息，进行处理，并做出决策或生成回应。
+
+2. **RAG & VectorStore（检索增强生成与向量数据库） ——  图书馆/长期记忆**
+
+存储海量的专业知识（公司文档、知识库等），并能在需要时快速、准确地检索相关信息提供给“大脑”。它是一个巨大的私人图书馆或长期记忆仓库，当你需要解决一个专业问题时，你会来图书馆查阅相关资料，然后将这些资料带给大脑（LLM）进行参考和分析。
+
+3. **Agents（智能体） ——  神经系统/小脑**
+
+负责决策“如何”完成任务。它接收用户指令，进行规划，决定是直接由大脑（LLM）回答，还是需要调用各种工具（Tools），并按照什么顺序来执行。就像人体的神经系统或小脑。大脑（LLM）负责出主意，而Agent负责协调身体各部分去执行这个主意。例如，你想“拿一杯水”，大脑发出指令，神经系统（Agent）会规划并协调眼睛（观察）、手（抓取）等一系列动作。
+
+4. **Tools（工具） ——  手、脚和感官**
+
+是Agent可以调用的具体功能，用于与外部世界交互。就像人的手、脚、眼睛和耳朵。
+
+5. **Chains（链） ——  技能或肌肉记忆**
+
+将多个步骤（LLM调用、工具使用、数据处理）预先定义并链接在一起，形成一个可重复执行的固定流程。像是你学会的一种“技能”或“肌肉记忆”。例如，“泡咖啡”这个技能就是一个链：走到咖啡机前 -> 加咖啡粉 -> 按开关 -> 等待 -> 拿杯子。一旦学会，你就可以不假思索地完成。
+
+6. **Memory（记忆） ——  短期记忆/对话记忆**
+
+用于存储和回顾当前对话的历史信息，使AI能够拥有上下文感知能力，实现连贯的多轮对话。就像你的短期记忆。它让你记得在刚才的对话中对方说了什么，从而能做出相关的回应。没有记忆，每一次对话都是全新的、孤立的。
+
+7. **PromptTemplates（提示模板） ——  沟通技巧/提问模板**
+
+预先设计好的、结构化的提示词，用于更有效、更稳定地向LLM提问。就像沟通技能、演讲技能，写作技能，都有一套固定的模版。
+
+通过这个比喻，我们可以清晰地看到：**LLM是智能的核心（脑）、RAG是知识储备（图书馆）、Agents是协调指挥官（神经系统）、Tools是执行手段（手脚）、Chains是自动化技能（肌肉记忆）、Memory是上下文感知（短期记忆）**，它们各司其职，紧密协作，共同构成了一个能够理解、推理并作用于外部世界的智能体。
+
+
+**LangChain相关资料地址如下：**
+
+LangChain 官网地址： https://www.langchain.com/langchain
+LangChain 官网文档： https://python.langchain.com/docs/introduction/
+LangChan API文档： https://python.langchain.com/api_reference/
+LangChain github地址： https://github.com/langchain-ai/langchain
+LangChain中文网： https://python.langchain.com.cn/docs/
+Open AI中文文档： https://openai.xiniushu.com/
