@@ -37,8 +37,8 @@ LangChain是2022年10月（ChatGPT在2022年11月30问世，比ChatGPT还早）�
 
 <table>
   <colgroup>
-    <col style="width:132px">
-    <col style="width:292px">
+    <col style="width:136px">
+    <col style="width:320px">
     <col>
   </colgroup>
   <thead>
@@ -61,7 +61,7 @@ LangChain是2022年10月（ChatGPT在2022年11月30问世，比ChatGPT还早）�
     </tr>
     <tr>
       <td>外部数据集成</td>
-      <td>自行实现数据加载、处理、向量化与检索逻辑</td>
+      <td>自行实现数据加载、处理、向量化与检索</td>
       <td>内置RAG（检索增强生成）等强大支持，可轻松连接PDF、数据库、API等外部数据源</td>
     </tr>
     <tr>
@@ -148,7 +148,7 @@ chat_model = ChatOpenAI(
 )
 ```
 
-## LangChain核心组件之Model I/O
+## 3. LangChain核心组件之Model I/O
 
 ### 3.1 Model I/O
 
@@ -266,3 +266,468 @@ messages = prompt_template.invoke({"domain": "反洗钱"})
 response = chat_model.invoke(messages)
 print(response.content)
 ```
+
+**2、ChatPromptTemplate**：创建聊天消息列表的提示模板。**生成的是结构化的消息列表，其中每条消息都带有明确的角色**（如系统、用户、AI），用在对话模型中。
+
+```py
+# 方式一，使用构造函数创建
+chatprompt_template = ChatPromptTemplate([
+    # key: 角色, value: 内容,
+    ("system", "你是一个反洗钱领域的专家，你的名字是{name}"),  # 系统提示词
+    ("human", "帮我解答一下{question}")   # 用户提示词
+])
+
+# 填充模版参数
+message = chatprompt_template.format(name="RiskHelper", question="什么是反洗钱？")
+response = chat_model.invoke(message)
+print(response.content)
+
+# 方式二，使用from_messages方法创建
+chatprompt_template = ChatPromptTemplate.from_messages([
+    ("system", "你是一个反洗钱领域的专家，你的名字是{name}"),
+    ("human", "帮我解答一下{question}")
+])
+# 填充模版参数
+messages = chatprompt_template.format(name="RiskHelper", question="什么是反洗钱？")
+response = chat_model.invoke(messages)
+print(response.content)
+```
+
+**3、XxxMessagePromptTemplate** ：特定角色的消息提示词模板，包括：SystemMessagePromptTemplate、HumanMessagePromptTemplate、AIMessagePromptTemplate、ChatMessagePromptTemplate等，通常用ChatPromptTemplate将消息提示词模版打包在一起，一并发送给模型。
+
+```py
+# 创建聊天提示词模版
+chatprompt_template = ChatPromptTemplate([
+    # 创建系统提示词模版
+    SystemMessagePromptTemplate.from_template("你是一个反洗钱领域的专家，你的名字是{name}"),
+    # 创建用户提示词模版
+    HumanMessagePromptTemplate.from_template("帮我解答一下{question}")
+])
+
+# 填充模版参数
+message = chatprompt_template.format(name="RiskHelper", question="什么是反洗钱？")
+response = chat_model.invoke(message)
+print(response.content)
+```
+
+**4、FewShotPromptTemplate**：样本提示词模板，提供少量的样例作为参考来引导大模型按照特定的格式和风格输出。
+
+```py
+# 1. 定义示例数据
+examples = [
+    {
+        "question": "什么是Spring Boot？",
+        "answer": "Spring Boot是一个基于Spring框架的开源Java框架，用于简化Spring应用程序的创建和部署。"
+    },
+    {
+        "question": "什么是依赖注入？",
+        "answer": "依赖注入是一种设计模式，通过外部容器向对象提供其所需的依赖，而不是对象自己创建依赖。"
+    },
+    {
+        "question": "什么是RESTful API？",
+        "answer": "RESTful API是遵循REST架构风格的Web服务接口，使用HTTP方法进行资源操作。"
+    }
+]
+# 2. 定义示例模板
+example_prompt = PromptTemplate(
+    input_variables=["question", "answer"],
+    template="问题: {question}\n答案: {answer}"
+)
+# 3. 创建few-shot提示词模版
+few_shot_prompt = FewShotPromptTemplate(
+    examples=examples,
+    example_prompt=example_prompt,
+    suffix="问题: {question}",
+    input_variables=["question"]
+)
+formatted_prompt = few_shot_prompt.format(question="什么是LangChain？")
+response = chat_model.invoke(formatted_prompt)
+print(response.content)
+```
+
+还有一些其他的提示词模版，可以参考：
+https://python.langchain.com.cn/docs/modules/model_io/prompts/prompt_templates/
+
+### 3.5 Output Parsers（输出解析器）
+
+大模型通常返回的内容都是字符串格式，但是我们实际开发中更擅长处理结构化数据，输出解析器就是**将大模型输出的结果转换成特定的结构化数据**，以便应用程序能更方便的处理。LangChain提供了一些常见的输出解析器，如**StrOutputParser**（字符串解析器）、**JsonOutputParser**（json解析器）、**CommaSeparatedListOutputParser**（csv解析器）、**DatetimeOutputParserde**（日期解析器）、**XmlOutputParser**（xml解析器）等下边用**JsonOutputParser**写一个简单的实例
+
+```py
+json_parser = JsonOutputParser()
+prompt_template = PromptTemplate(
+    template="用简单的一句话描述一下什么是{name}？请按照以下格式输出：{format_instructions}",
+    input_variables=["name"],
+    # 告诉大模型，按照json格式输出
+    partial_variables={"format_instructions": json_parser.get_format_instructions()}
+)
+messages = prompt_template.invoke({"name": "反洗钱"})
+response = chat_model.invoke(messages)
+print(json_parser.parse(response.content))
+```
+
+### 3.6 模型的调用方式
+
+Runnable 接口是使用LangChain组件的基础，它在许多组件中实现，例如语言模型、输出解析器、检索器、编译的LangGraph 图等。Runnable 方式定义了一个标准接口，允许 Runnable 组件用以下方式调用：
+
+**1、invoke**：处理单条输入，等待模型完全处理完成后再返回结果，上述的例子都是invoke调用
+
+**2、stream**：流式响应，逐字符输出模型的响应，类似于我们日常使用的AI应用（元宝）一样，给用户输出是逐字输出，无需等所有的结果生成后一次返回，对于用户交互体验较好。
+
+```py
+# 流式输出
+chat_model = ChatOpenAI(
+    model_name=model_name,
+    base_url=base_url,  # 与模型交互的地址
+    api_key=api_key,  # 秘钥
+    streaming=True   # 开启流式输出
+)
+chatprompt_template = ChatPromptTemplate([
+    SystemMessagePromptTemplate.from_template("你是一个反洗钱领域的专家"),
+    HumanMessagePromptTemplate.from_template("请详细讲一下什么是{value}？")
+])
+message = chatprompt_template.invoke({"value": "反洗钱"})
+for output in chat_model.stream(message):
+    # 逐个打印token内容
+    print(output.content, end="", flush=True)
+```
+
+**3、batch**：批量处理，可以将多个消息一起发送给模型。
+
+```py
+# 创建三个消息
+message1 = [HumanMessage(content="什么是风控？")]
+message2 = [HumanMessage(content="什么是反洗钱？")]
+message3 = [HumanMessage(content="什么是EDD？")]
+messages = [message1, message2, message3]
+# 批量调用
+response = chat_model.batch(messages)
+print(response)
+```
+
+LangChain还提供了与上边相对应的异步方法：
+
+1. **astream**：异步流式响应
+2. **ainvoke**：异步处理单条输入
+3. **abatch**：异步处理批量输入
+4. **astream_log**：异步流式返回中间步骤，以及最终响应
+
+如果对具体的调用方式感兴趣可以参考官方文档：LangChain-Runnable调用
+
+https://docs.langchain.com/oss/javascript/langchain/overview
+
+## 4. LangChain核心组件之Chains
+
+### 4.1 Chain（链）概述
+
+链，它将多个组件（提示词模版、大模型、记忆、工具、输出解析器）串联起来，**形成一个可执行的，自动化的工作流程，类似于流水线作业**。它将上一个组件的输出作为下一个组件的输入，将多个步骤串连起来执行，最终将模型的响应结果返回给用户。一个小Chain可以包含提示词模版->大模型->输出解析器，一个主Chain也可以将多个子Chain串起来，比如输入一篇文章先翻译（Chain A），再总结（Chain B）。
+
+![Image](https://github.com/user-attachments/assets/afb1b147-aed5-4cc2-96e6-b5be841a6838)
+
+### 4.2 Chain组件使用
+
+**1、LLMChain（已过时）**：最基础的Chain，将一个提示词模板和一个大模型封装在一起，构成一个可执行的单元。适用于简单的问答、文本生成等单步任务。它的工作流程是：将用户输入的数据填充提示词模板，然后将格式化后的提示词发送给大模型，最终返回大模型的生成结果。
+
+```py
+chatprompt_template = ChatPromptTemplate([
+    SystemMessagePromptTemplate.from_template("你是一个反洗钱领域的专家，你的名字是{name}"),
+    HumanMessagePromptTemplate.from_template("帮我解答一下{question}")
+])
+# 创建链
+chain = LLMChain(llm=chat_model, prompt=chatprompt_template)
+# 调用链，先执行prompt，并将结果给到llm，再执行llm，最后返回结果
+response = chain.invoke({"name": "RiskHelper", "question": "什么是反洗钱？"})
+print(response)
+```
+
+注意：上述是LLMChain的使用，但是LLMChain在0.1.17版本已经被标记为过时，且在1.0版本后会被移除。
+
+**2、SequentialChain（顺序链，已过时）**：通过将多个Chain串起来，实现分步任务处理，前一个链的输出作为后一个链的输入，适用于需要分步处理的任务，如先总结再翻译。
+
+```py
+chatprompt_template1 = ChatPromptTemplate([
+    SystemMessagePromptTemplate.from_template("你是一个{name}领域的专家"),
+    HumanMessagePromptTemplate.from_template("请详细讲一下什么是{title}？")
+])
+chain1 = LLMChain(llm=chat_model, prompt=chatprompt_template1, output_key="text")
+chatprompt_template2 = ChatPromptTemplate([
+    SystemMessagePromptTemplate.from_template("你是一个文章总结专家"),
+    HumanMessagePromptTemplate.from_template("请帮我用一句话概括一下{text}")
+])
+chain2 = LLMChain(llm=chat_model, prompt=chatprompt_template2, output_key="translation")
+# 构建顺序链
+chain = SequentialChain(
+    chains=[chain1, chain2],
+    input_variables=["name", "title"],
+    output_variables=["translation"]
+)
+response = chain.invoke({"name": "反洗钱", "title": "EDD"})
+print(response)
+```
+
+SequentialChain也在0.1.17版本被标记为过时，且在1.0版本后会被移除
+
+**3、LCEL（LangChain Expression Language，推荐使用的方式）**：是 LangChain 框架中用于构建和组合Chain的一种声明式、模块化且高效的语言。类似于Linux中的管道符 | ，将提示模板、语言模型、输出解析器等组件灵活地组合成可执行的工作流。
+
+```py
+json_parser = JsonOutputParser()
+prompt_template = PromptTemplate(
+    template="用简单的一句话描述一下什么是{name}？请按照以下格式输出：{format_instructions}",
+    input_variables=["name"],
+    # 告诉大模型，按照json格式输出
+    partial_variables={"format_instructions": json_parser.get_format_instructions()}
+)
+# 使用管道符构建chain
+chain = prompt_template | chat_model | json_parser
+response = chain.invoke({"name": "反洗钱"})
+print(response)
+```
+
+除了上述的chain之外，LangChain还提供了以下类型的chain。
+
+1. **LLMMathChain（数学链）**：将用户问题转换为数学问题，再转换为可以使用Python的numexpr库执行的表达式。
+2. **RouterChain（路由链）**：根据输入内容分析并决定调用哪个专用的子链处理。可以自动分析用户的需求，然后路由到最适合的链中执行，并返回最终结果。
+3. **StuffDocumentsChain（文档链）**：将多个文档内容合并 （“填充”或“塞入”）到单个提示词中，然后调用大模型进行处理。
+
+
+## 5. LangChain核心组件之Memory
+
+### 5.1 Memory（记忆）概述
+
+我们知道，**大模型本身都不会记忆任何上下文信息**，那为什么我们常用的大模型应用能够清楚的知道我们之前的对话内容（与AI应用可以进行多轮对话）？并且有一定的记忆能力，这就需要额外的模块去保存我们和大模型进行对话的上下文信息，然后在下一次对话前将历史的记录全部发送给大模型，提供给大模型参考以便能够更准确的回答当前的提问。
+
+在LangChain中，这个用于存储用户和模型交互的历史信息的组件叫Memory，它能够让应用记住用户之前说了什么，从而实现对话的上下文感知能力，为构建真正智能和上下文感知的链式对话系统提供了基础。
+
+### 5.2 Memory的原理
+
+![Image](https://github.com/user-attachments/assets/4168175f-531f-48fd-8744-264d615b47b7)
+
+STEP1：用户输入问题
+STEP2：从Memory中读取历史消息
+STEP3：构建新的提示词，包含历史消息和当前的提问
+STEP4：发送给大模型处理
+STEP5：解析大模型输出，并返回用户
+STEP6：将历史对话和当前对话一起保存在Memory中，以便下一次使用
+
+### 5.3 Memory组件使用
+
+LangChain中提供了一系列的Memory用于保存历史上下文，不同的Memory保存的内容也不一样，常用的使用方式如下：
+
+**1、ChatMessageHistory**：用于存储和管理对话消息的基础类，它直接操作消息对象（如HumanMessage, AIMessage 等），是其它记忆组件的底层存储工具。特点：轻量、无需额外依赖、数据不会持久化（程序重启后丢失）。
+
+```py
+# 创建Memory
+history = ChatMessageHistory()
+# 添加用户消息
+history.add_user_message("你好，我是RiskHelper")
+# 添加AI消息
+history.add_ai_message("我是DeepSeek大模型")
+# 添加用户消息
+history.add_user_message("我是谁？")
+# 通过将history.messages 直接传入大模型，大模型能够看到完整的对话上下文，从而实现有记忆的连续对话
+response = chat_model.invoke(history.messages)
+print(response.content)
+```
+
+**2、ConversationBufferMemory**：是LangChain中最基础、最直接的记忆组件，**按顺序完整地记录用户与AI之间的每一轮对话**，并将这些历史信息提供给模型，以实现连贯的多轮对话。**他能保存全部的上下文信息，对话连贯性最强，但是会消耗大量的Token，且随着对话的进行，会占用大量的内存资源**。它适用于短对话，需要保存完整的上下文信息的复杂任务。
+
+```py
+prompt_template = PromptTemplate.from_template(
+  "历史对话: {history}，当前问题: {input}"
+)
+memory = ConversationBufferMemory(memory_key="history")
+chain = LLMChain(llm=chat_model, prompt=prompt_template, memory=memory)
+response = chain.invoke({"input": "用简单一句话描述什么是LangChain？"})
+print(response)
+print("==============================================================")
+response = chain.invoke({"input": "如何使用它？"})
+print(response)
+```
+
+**3、ConversationBufferWindowMemory**：只保留最近 K 轮对话，解决ConversationBufferMemory占用内存多、tokken消耗大问题，平衡连贯性与资源消耗。随之带来的问题是会丢失早期上下文，不适合复杂场景。
+
+```py
+prompt_template = PromptTemplate.from_template(
+  "历史对话: {history}，当前问题: {input}"
+)
+memory = ConversationBufferWindowMemory(memory_key="history", k=10) # k表示保留的对话轮数
+chain = LLMChain(llm=chat_model, prompt=prompt_template, memory=memory)
+response = chain.invoke({"input": "用简单一句话描述什么是LangChain？"})
+print(response)
+```
+
+**4、ConversationSummaryMemory**：它是 LangChain 中一种智能的记忆管理组件，它通过自动生成对话摘要来解决长对话上下文管理的问题。与简单截断历史的记忆类型不同，**它使用大模型来提炼对话精髓，实现长期记忆**。核心思想是：**不存储原始对话记录，而是存储对话的智能摘要**。当新的对话发生时，系统会将现有摘要与最新对话结合，生成更新的摘要。
+
+```py
+history = ChatMessageHistory()
+history.add_ai_message("你好，我是RiskHelper")
+history.add_user_message("你好，什么是反洗钱？")
+history.add_user_message("你好，什么是风控”")
+memory = ConversationSummaryMemory.from_messages(llm=chat_model,chat_memory=history)
+print(memory.load_memory_variables({}))
+```
+
+**5、ConversationSummaryBufferMemory**：是LangChain中一种非常实用的混合型记忆组件，它巧妙地**将对话摘要与原始对话缓冲区结合起来，旨在解决长对话场景下既要保持上下文连贯性又要控制资源消耗的核心矛盾**。其核心创新在于采用了分层记忆管理策略，在对话连贯性和资源消耗之间找到平衡点。
+
+```py
+memory = ConversationSummaryBufferMemory(
+  llm=chat_model,
+  max_token_limit=100,
+  return_messages=True
+)
+memory.save_context({"input": "你好，我是RiskHelper"},{"output": "你好，我是DeepSeek大模型"})
+memory.save_context({"input": "你好，什么是反洗钱？"},{"output": "反洗钱是指对洗钱犯罪的预防和打击措施"})
+memory.save_context({"input": "你好，什么是风控？"},{"output": "风控是指对风险的控制措施"})
+memory.save_context({"input": "你好，EDD？"},{"output": "EDD是指对客户身份的识别措施"})
+print(memory.load_memory_variables({}))
+```
+
+注意： 有些模型（如Deepseek）没提供get_num_tokens_from_messages（计算token）函数，执行时会报错，解决办法继承ChatOpenAI，然后实现get_num_tokens_from_messages函数：
+
+```py
+#创建一个继承于ChatOpenAI的类，并实现get_num_tokens_from_messages方法
+class DeepSeekChatOpenAI(ChatOpenAI):
+    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        #实现get_num_tokens_from_messages方法，返回消息的token数量
+        total_tokens = 100 # 自定义函数
+        return total_tokens;
+chat_model = DeepSeekChatOpenAI(
+    model_name=model_name,
+    base_url=base_url,
+    api_key=api_key
+)
+```
+
+除了上述介绍的Memory之外，LangChain还提供了一下其他的Memory：
+
+**6、ConversationEntityMemory**：一种基于实体的对话记忆机制，它能够智能地识别、存储和利用对话中出现的实体信息（如人名、地点、产品等）及其属性/关系，并结构化存储，使 AI 具备更强的上下文理解和记忆能力，能够解决信息过载问题。
+
+**7、ConversationKGMemory**： 一种基于知识图谱的先进记忆组件，它将对话内容组织成结构化的知识图谱，实现更加语义化和关联性的记忆管理。
+
+**8、VectorStoreRetrieverMemory**：一种基于向量数据库的先进记忆组件，它利用语义相似度检索技术，从大量历史对话中智能召回与当前对话最相关的记忆片段。
+
+## 6. LangChain核心组件之Tools
+
+### 6.1 Tools概述
+
+Tools是大模型、智能体（Agent）与外部世界进行交互的核心组件，本质上是**封装了一些特定功能的可调用的函数（数学计算、获取时间、搜索等）**， 允许大模型与外部系统、API、数据源和工具进行交互，其核心价值在于极大地扩展了 LLM 应用的能力边界（动作）。
+
+![Image](https://github.com/user-attachments/assets/484fb99e-e988-4f22-9cc6-76b45d907475)
+
+![Image](https://github.com/user-attachments/assets/f8d37bec-199f-4a1d-a4fe-f7894e0d7ff9)
+
+### 6.2 Tools组件使用
+
+Tool 通常包含如下几个要素：
+
+1. 工具名称 - 工具的唯一标识，通常是函数名，也可以自定义
+2. 工具描述 - 工具的功能说明，应当清晰准确的描述工具的作用、使用场景等，直接决定Agent是否会使用这个工具
+3. 参数定义 - 每个参数的名称、类型、描述、是否必需
+4. 返回类型 - 工具返回的数据类型
+5. 执行逻辑 - 实际的代码实现
+
+使用流程：
+
+![Image](https://github.com/user-attachments/assets/7bc47bdb-d106-4e9a-b1ce-1f413e90c78a)
+
+STEP1-工具创建：使用@tool注解创建工具。
+
+STEP2-工具绑定：将创建的工具绑定到Agent上（可以绑定多个），包括工具的名称、描述、参数、返回等，让Agent知道有哪些工具可用。
+
+STEP3-工具调用：模型返回调用具体的工具后，Agent根据该工具的参数描述构造参数，并发起调用
+
+STEP4-工具执行：执行工具的具体逻辑，并返回结果。
+
+**两种自定义工具的方式：**
+
+**方式一：@tool装饰器**
+
+```py
+@tool(
+    # 指定工具的名称，这是 Agent 识别和调用工具时使用的标识符。
+    # 默认值：如果不指定，默认使用函数名作为工具名称。
+    name_or_callable="multiply",  #
+    # 用于告诉 Agent 这个工具的功能和用途。这对 Agent 选择合适的工具至关重要。
+    # 默认值：如果不指定，会尝试使用函数的文档字符串（docstring）作为描述。如果文档字符串也没有，则为空字符串。
+    description="Multiply two numbers",
+    # 控制工具执行结果的返回方式
+    # True：工具的输出直接作为 Agent 的最终回答返回给用户
+    # False：工具的输出会传递给 Agent，由 Agent 进一步处理或与其他信息结合后再回答
+    return_direct=True
+)
+def multiply(a: int, b: int) -> int:
+    """Multiply a and b."""  # 如果不指定description，这会成为工具描述
+    return a * b
+response = multiply.invoke({"a": 2, "b": 3})
+print(response)
+```
+
+**方式二：StructuredTool的from_function()**
+
+```py
+multiply = StructuredTool.from_function(
+    # 绑定函数
+    func=multiply,
+    # 指定工具的名称，这是 Agent 识别和调用工具时使用的标识符。
+    name="multiply",
+    # 用于告诉 Agent 这个工具的功能和用途。这对 Agent 选择合适的工具至关重要。
+    description="Multiply two numbers"
+)
+response = multiply.invoke({"a": 2, "b": 3})
+print(response)
+```
+
+**结合大模型使用：**
+
+注意：tool一般与agent一起配合使用，agent在下一章详细介绍
+
+```py
+# 将函数封装为LangChain工具对象
+stock_tool = Tool(
+    name="getStockPrice",  # 工具名称（模型将使用此名称调用工具）
+    func=getStockPrice,  # 工具函数
+    description="用于查询公司股票价格。输入应该是公司名称（如：腾讯）"
+    # 工具描述（模型根据此决定是否调用）
+)
+# 创建工具列表（Agent可以使用的所有工具）
+tools = [stock_tool]
+# 将LangChain工具转换为OpenAI函数调用格式
+functools = [convert_to_openai_tool(tool) for tool in tools]
+# 从LangChain Hub加载预定义的提示模板
+# 'hwchase17/structured-chat-agent'是一个专门为结构化聊天Agent设计的提示模板
+prompt = hub.pull('hwchase17/structured-chat-agent')
+# 创建结构化聊天Agent，# 参数：模型对象、工具列表、提示模板
+agent = create_structured_chat_agent(chat_model, tools, prompt)
+# 创建Agent执行器
+agent_executor = AgentExecutor(
+    agent=agent,                # 配置好的Agent
+    tools=tools,                # Agent可用的工具列表
+    verbose=True,               # 开启详细日志（显示Agent思考过程）
+    handle_parsing_errors=True  # 处理解析错误（防止因格式问题崩溃）
+)
+# 执行Agent查询
+response = agent_executor.invoke({"input": "查询腾讯当日的股票价格"})
+print(response)
+```
+
+注意：实际使用过程中发现，有时候并没有调用自定义的工具，可能原因是：
+
+1. **大模型认为这个计算太简单（1+1），无需调用工具。**
+2. **工具的描述不清楚，大模型无法推断出使用这个工具。**
+3. **有些模型对于工具调用支持度不高，如DeepSeek-R1。**
+
+**具体可通过修改工具描述、提示词或换一个模型等引导模型决定调用自定义工具。**
+
+### 6.3 MCP Server
+
+Agent tools可以看做是实现在AI Agent应用中的一系列函数，但是很多Tool 的功能比较通用，如浏览网页，发送消息，天气查询等，所以将通用的工具封装成一个单独的服务，就可以供不同的Agent使用了，这个单独的服务叫MCP Server，**其中MCP是一个通讯协议，用来规范Agent 和MCP Server之间是怎么交互的**，如工具的功能，描述，参数等。MCP Server可以与Agent部署在同一台机器上通过标准输入输出通讯，也可以部署在网络上通过http协议通讯。**虽然MCP是为了大模型而制定的标准，但实际上MCP本身和大模型没有关系，它并不关心Agent使用哪个模型，MCP只负责帮Agent管理工具、资源和提示词。**
+
+LangChain中的Tool 和 MCP Server比较：
+
+| 对比维度            | 内置Tools | MCP Server     |
+|--------------------|------------------|-------------------------|
+| 部署位置      | Agent 内部（同一进程）    | 独立服务（独立进程/网络） |
+| 代码耦合      | 紧耦合（直接引用）        | 松耦合（协议通信） |
+| 复用性      | 仅当前 Agent 可用       | 多个 Agent 可共享 |
+| 更新维护      | 修改需重新编译 Agent    | 修改需重新编译 Agent 独立更新 |
+| 性能         | 本地调用，极快    | 需要网络/IPC通信 |
+| 适用场景      | 简单、专用工具    | 通用、复杂工具 |
