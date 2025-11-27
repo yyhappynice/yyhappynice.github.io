@@ -1,5 +1,5 @@
 ---
-title: LangChainjs 框架简介
+title: LangChain 框架简介
 date: 2025-11-6 11:10:16
 categories:
   - LangChainjs
