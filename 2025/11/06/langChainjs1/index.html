@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="yyhappynice">
+
+
+
+
+
+<title>LangChainjs 框架简介 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+
+        <!-- 背景图片自动替换样式 -->
+        <style type="text/css">
+            .back {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                z-index: -1;
+                transition: background-image 0.5s ease-in-out;
+            }
+        </style>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <!-- 背景图片容器 -->
+    <div class="back"></div>
+
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+
+        // 背景图片自动替换功能
+        (function () {
+            // 获取当前时间并计算图片索引（每2分钟更换一次）
+            function getImageIndex() {
+                const minutes = new Date().getMinutes();
+                return Math.floor((minutes + 1) / 2);
+            }
+
+            // 设置背景图片
+            function setBackgroundImage() {
+                const imageIndex = getImageIndex();
+                const imageUrl = `/bgimg/${imageIndex}.jpg`;
+                const backElement = document.querySelector('.back');
+
+                if (backElement) {
+                    backElement.style.backgroundImage = `url(${imageUrl})`;
+                }
+            }
+
+            // 页面加载完成后设置背景图片
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', setBackgroundImage);
+            // } else {
+            //     setBackgroundImage();
+            // }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">YuYi&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">YuYi&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+        
+            <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function () {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function () {
+        console.log('TOC: Document ready, initializing tocbot...');
+        console.log('TOC: Content selector:', tocbot_default_config.contentSelector);
+        console.log('TOC: Heading selector:', tocbot_default_config.headingSelector);
+
+        // 检查内容容器是否存在
+        var contentElement = document.querySelector(tocbot_default_config.contentSelector);
+        console.log('TOC: Content element found:', contentElement);
+
+        if (contentElement) {
+            var headings = contentElement.querySelectorAll(tocbot_default_config.headingSelector);
+            console.log('TOC: Found headings:', headings.length);
+
+            try {
+                tocbot.init(obj_merge(tocbot_default_config, {
+                    collapseDepth: 1
+                }));
+                console.log('TOC: tocbot initialized successfully');
+            } catch (error) {
+                console.error('TOC: tocbot initialization failed:', error);
+            }
+        } else {
+            console.error('TOC: Content element not found:', tocbot_default_config.contentSelector);
+        }
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+                
+
+                    
+                        <article class="post-wrap">
+                            <header class="post-header">
+                                <h1 class="post-title">
+                                    LangChainjs 框架简介
+                                </h1>
+                                
+                                    <div class="post-meta">
+                                        
+                                            Author: <a itemprop="author" rel="author" href="/">yyhappynice</a>
+                                            
+
+                                                
+                                                    <span class="post-time">
+                                                        Date: <a href="#">十一月 6, 2025&nbsp;&nbsp;11:10:16</a>
+                                                    </span>
+                                                    
+                                                        
+                                                            <span class="post-category">
+                                                                Category:
+                                                                
+                                                                    <a href="/categories/LangChainjs/">LangChainjs</a>
+                                                                    
+                                                            </span>
+                                                            
+                                    </div>
+                                    
+                            </header>
+
+                            <div class="post-content">
+                                <p><img src="https://github.com/user-attachments/assets/b32fafaa-f59d-46eb-98ac-87c839a8d1fe" alt="langchain"></p>
+<h2 id="1-LangChain概述"><a href="#1-LangChain概述" class="headerlink" title="1. LangChain概述"></a>1. LangChain概述</h2><h3 id="1-1-什么是LangChain"><a href="#1-1-什么是LangChain" class="headerlink" title="1.1 什么是LangChain"></a>1.1 什么是LangChain</h3><p>LangChain是2022年10月（ChatGPT在2022年11月30问世，比ChatGPT还早），由哈佛大学的Harrison Chase（哈里森·蔡斯）发起研发的一个<strong>用于开发基于大语言模型（LLM） 应用程序的开源框架</strong>，它的核心目标是简化AI应用的构建过程，让开发者能像搭积木一样，快速组合各种模块来实现复杂功能，如：搭建智能体（Agent）、问答系统（QA）、对话机器人、知识库等。</p>
+<p><strong>LangChain在Github上的热度变化：</strong></p>
+<p><img src="https://github.com/user-attachments/assets/23172560-274c-4ab3-97fb-1bce9bc046cf" alt="热度"></p>
+<p><strong>AI大模型架构图：</strong></p>
+<p><img src="https://github.com/user-attachments/assets/13385a10-66a8-4b0d-b4be-c34dc9894843" alt="Image"></p>
+<p><strong>LangChain所处的位置：</strong></p>
+<p><img src="https://github.com/user-attachments/assets/22979beb-7cfd-4431-937c-06c2aa98cbe1" alt="Image"></p>
+<h3 id="1-2-为什么使用LangChain"><a href="#1-2-为什么使用LangChain" class="headerlink" title="1.2 为什么使用LangChain"></a>1.2 为什么使用LangChain</h3><p>使用 LangChain 的核心价值在于，它提供了一套<strong>高度模块化、可扩展的工具集</strong>，让开发人员能够快速、灵活地构建功能丰富的大模型应用，无需关注底层复杂的细节。它开发难度小，学习成本低，并且提供了现成的链式组装，能够让复杂的逻辑变得结构化、可扩展。LangChain最初只是一个开源的软件包，如今已称为一个完整的生态系统，它提供了一系列的标准化组件，且都可以单独使用。</p>
+<p>下表是直接对接大模型和使用LangChain的对比：</p>
+<table>
+  <colgroup>
+    <col style="width:136px">
+    <col style="width:320px">
+    <col>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>对比维度</th>
+      <th>直接调用大模型API</th>
+      <th>使用 LangChain 开发</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>开发模式</td>
+      <td>相对直接，但复杂功能需大量自定义代码</td>
+      <td>模块化组装，提供大量预制组件和链，简化复杂逻辑</td>
+    </tr>
+    <tr>
+      <td>多模型支持</td>
+      <td>通常需为不同供应商的API编写适配代码</td>
+      <td>统一接口，轻松切换或组合不同模型（如OpenAI、Anthropic等）</td>
+    </tr>
+    <tr>
+      <td>外部数据集成</td>
+      <td>自行实现数据加载、处理、向量化与检索</td>
+      <td>内置RAG（检索增强生成）等强大支持，可轻松连接PDF、数据库、API等外部数据源</td>
+    </tr>
+    <tr>
+      <td>上下文管理</td>
+      <td>需手动管理对话历史，易超出Token限制</td>
+      <td>内置Memory组件，灵活管理短期和长期记忆，维持连贯对话</td>
+    </tr>
+    <tr>
+      <td>复杂任务自动化</td>
+      <td>实现多步骤推理或工具调用逻辑复杂</td>
+      <td>通过Agents，让模型能自主决策、调用工具（如计算器、搜索引擎）完成任务</td>
+    </tr>
+    <tr>
+      <td>生产部署与调试</td>
+      <td>缺乏标准化工具，监控和调试较困</td>
+      <td>提供LangSmith等平台，用于监控、追踪和调试应用性能</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="1-3-LangChain架构设计（宏观）"><a href="#1-3-LangChain架构设计（宏观）" class="headerlink" title="1.3 LangChain架构设计（宏观）"></a>1.3 LangChain架构设计（宏观）</h3><p>LangChain是由多个包组成的框架：</p>
+<p><img src="https://github.com/user-attachments/assets/12608792-a56d-4573-aa4a-c7e3ac092e10" alt="Image"></p>
+<p>图中展示了LangChain（V0.3版本）生态系统的主要组件及其分类，分为三个层次：<strong>架构</strong>(Architecture)、<strong>组件</strong>(Components)和<strong>部署</strong>(Deployment)。</p>
+<p><strong>结构1：LangChain（架构中的LangChain，也是后文介绍的）</strong>：封装了一系列的API。</p>
+<ol>
+<li>langchain：构成应用程序认知架构的Chains，Agents，Retrieval strategies等</li>
+<li>langchain-community：第三方集成，⽐如：Model I&#x2F;O、Retrieval、Tool等。</li>
+<li>langchain-Core：基础抽象和LangChain表达式语言 (LCEL)</li>
+</ol>
+<p><strong>结构2：LangGraph</strong>：基于有向图+条件边来灵活的构建多智能体应用，提供了条件分支、循环、并行等复杂控制流，能够实现状态持久化、断点续跑、时间旅行、人机协作等高级功能。</p>
+<p><strong>结构3：LangSmith</strong>：用于构建、调试、测试、评估、监控和链路追踪大模型应用程序，提供了6大功能，涉及Debugging (调试)、Playground (沙盒)、Prompt Management (提示管理)、Annotation (注释)、Testing (测试)、Monitoring (监控)等。与LangChain无缝集成，从原型阶段过渡到生产阶段。</p>
+<p><strong>结构4：LangServe</strong>：将基于 LangChain 开发的链（Chain）、代理（Agent）等快速部署为 REST API 服务。它基于 FastAPI 构建，极大简化了 AI 应用服务化的流程</p>
+<p><strong>LangChain当中，目前最火的两个模块就是：LangGraph，LangSmith。</strong></p>
+<h3 id="1-4-LangChain核心组件"><a href="#1-4-LangChain核心组件" class="headerlink" title="1.4 LangChain核心组件"></a>1.4 LangChain核心组件</h3><p>LangChain提供了一个高度模块化且可组合的框架，开发者能通过灵活集成其六大核心组件，来构建功能复杂的大模型应用。</p>
+<p><img src="https://github.com/user-attachments/assets/2f323fe4-3e05-4cc3-b0eb-d4836680596c" alt="Image"></p>
+<ol>
+<li><p><strong>Model I&#x2F;O（模型交互标准化接口）</strong>：提供统一的模型交互接口，封装提示模板调用、模型推理与输出解析，实现不同大语言模型输入的标准化与输出的结构化处理</p>
+</li>
+<li><p><strong>Chains（链）</strong>：用于链式工作流编排，将多个模块串联起来组成一个完整的流程，例如，一个 Chain 可能包括一个 Prompt 模板、一个大模型和一个输出解析器，它们协同工作，处理用户输入并返回结果。</p>
+</li>
+<li><p><strong>Memory（记忆）</strong>：用于保存历史对话和上下文信息，以便在后续对话中使用，从而实现有状态的对话。</p>
+</li>
+<li><p><strong>Agents（智能体）</strong>：自主决策并调用工具，赋予大模型行动能力</p>
+</li>
+<li><p><strong>Retrieval（检索，RAG核心）</strong>：从大量的文档或数据源中查找相关信息的核心模块，是构建RAG（检索增强生成）的基础</p>
+</li>
+<li><p><strong>Callbacks（保障应用可观测性）</strong>：回调机制，允许连接到 LLM 应用程序的各个阶段，可以监控和分析LangChain的运行情况，比如日志记录、监控、流传输等，以优化性能。</p>
+</li>
+</ol>
+<p><strong>后续章节将详细介绍以上组件的使用方式。</strong></p>
+<h2 id="2-LangChain使用之环境准备"><a href="#2-LangChain使用之环境准备" class="headerlink" title="2. LangChain使用之环境准备"></a>2. LangChain使用之环境准备</h2><h3 id="2-1-安装LangChain"><a href="#2-1-安装LangChain" class="headerlink" title="2.1 安装LangChain"></a>2.1 安装LangChain</h3><p>LangChain基于Python开发，因此需确保系统中安装了Python环境。</p>
+<p><strong>安装LangChain</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">方式一：pip install langchain</span><br><span class="line">方式二：conda install langchain</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-简单demo"><a href="#2-2-简单demo" class="headerlink" title="2.2 简单demo"></a>2.2 简单demo</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">chat_model = ChatOpenAI(</span><br><span class="line">  model_name=model_name,</span><br><span class="line">  base_url=base_url,  <span class="comment"># 与模型交互的地址</span></span><br><span class="line">  api_key=api_key,  <span class="comment"># 秘钥</span></span><br><span class="line">  temperature=<span class="number">0.7</span>   <span class="comment"># 温度参数,控制生成文本的随机性</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-LangChain核心组件之Model-I-O"><a href="#3-LangChain核心组件之Model-I-O" class="headerlink" title="3. LangChain核心组件之Model I&#x2F;O"></a>3. LangChain核心组件之Model I&#x2F;O</h2><h3 id="3-1-Model-I-O"><a href="#3-1-Model-I-O" class="headerlink" title="3.1 Model I&#x2F;O"></a>3.1 Model I&#x2F;O</h3><p>Model I&#x2F;O 是应用程序与大模型进行交互的组件，<strong>它与大模型的关系类似于JDBC与数据库的关系</strong>，本质上都是<strong>为了解耦应用逻辑与底层实现，提供标准化的交互接口</strong>，使应用程序无需关注大模型底层的实现，可与各种大模型进行交互。Model I&#x2F;O 包括输入<strong>提示(Format)</strong>、<strong>调用模型(Predict)</strong>、<strong>输出解析(Parse)</strong>。分别对应着Prompt Template（提示词模版），Model （大模型）和Output Parser（输出解析器）。</p>
+<p><img src="https://github.com/user-attachments/assets/b2b7a276-4dc6-4496-9199-7a7303543e4c" alt="Image"></p>
+<p>说白了，Model I&#x2F;O 就是LangChain 提供了一系列与大模型交互的API。</p>
+<h3 id="3-2-大模型分类（按功能）"><a href="#3-2-大模型分类（按功能）" class="headerlink" title="3.2 大模型分类（按功能）"></a>3.2 大模型分类（按功能）</h3><p><strong>1、LLMs（大语言模型）</strong></p>
+<p>也叫非对话模型，<strong>是许多语言模型应用程序的支柱</strong>，通用的文本生成，能够完成一次性的文本生成任务，如写作、翻译等。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">llm_model = OpenAI()</span><br><span class="line">llm_model.invoke(<span class="string">&quot;什么是LangChain?&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、Chat Models（对话模型）</strong></p>
+<p>专门为<strong>多轮对话场景</strong>优化的语言模型。与LLMs处理纯字符串不同，Chat Models的输入和输出都是<strong>结构化的消息对象</strong>，能更好地理解和维护对话的上下文。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建ChatOpenAI模型实例</span></span><br><span class="line">chat_model = ChatOpenAI(</span><br><span class="line">  model_name=model_name,</span><br><span class="line">  base_url=base_url,  <span class="comment"># 与模型交互的地址</span></span><br><span class="line">  api_key=api_key,  <span class="comment"># 秘钥</span></span><br><span class="line">  temperature=<span class="number">0.7</span>   <span class="comment"># 温度参数,控制生成文本的随机性</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用模型</span></span><br><span class="line">response = chat_model.invoke(<span class="string">&quot;用简单一句话概括一下什么是反洗钱？&quot;</span>)</span><br><span class="line"><span class="comment"># 打印模型响应内容</span></span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、Embedding Model（嵌入模型）</strong></p>
+<p>它的核心任务是<strong>将文字、图片等非结构化数据，转换成高维空间中的数值向量</strong>。并且能够将<strong>语义相近的内容在向量空间中的位置也映射得更近。</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 我这里使用的嵌入模型是自己本地部署的，OpenAI的类为OpenAIEmbeddings</span></span><br><span class="line">embeddings_model = OllamaEmbeddings(</span><br><span class="line">    model=<span class="string">&quot;nomic-embed-text&quot;</span>,</span><br><span class="line">    base_url=<span class="string">&quot;http://127.0.0.1:11434&quot;</span>,</span><br><span class="line">)</span><br><span class="line">vector = embeddings_model.embed_query(<span class="string">&quot;hello world&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;嵌入向量长度: <span class="subst">&#123;<span class="built_in">len</span>(vector)&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;前20个值: <span class="subst">&#123;vector[:<span class="number">20</span>]&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-Message（消息）"><a href="#3-3-Message（消息）" class="headerlink" title="3.3 Message（消息）"></a>3.3 Message（消息）</h3><p>消息是对话模型中通信的基本单位，用于表示与模型通讯的输入与输出，以及包含与对话相关的上下文信息和元数据，每一条消息都包含一个角色（系统、用户、AI等）和内容（用户的输入或模型的输出）以及其他元信息（id、名称、令牌使用情况等），LangChain提供了一个统一的消息格式，可以在不同模型之间使用。</p>
+<p><strong>1、SystemMessage（系统消息）</strong>：设定行为准则，用于定义大模型的角色、运行规则、环境信息等。如果模型不支持SystemMessage则LangChain会将消息合并到HumanMessage中一起发送给大模型。</p>
+<p><strong>2、HumanMessage（用户消息）</strong>：用户的输入，用户向模型发出的提问或指令。</p>
+<p><strong>3、AIMessage（大模型消息，一般是模型返回的结果）</strong>：大模型的输出，这是大模型对HumanMessage和SystemMessage的响应。它不仅包含生成的文本内容（content属性），还可能包含以下结构化信息（外部工具、调用令牌使用情况等元数据）。</p>
+<p><strong>4、ToolMessage&#x2F; FunctionMessage</strong>：连接外部能力，向模型传递外部工具或函数调用的执行结果，常用于Agent调用tool。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">chat_model = ChatOpenAI(</span><br><span class="line">    model_name=model_name,</span><br><span class="line">    base_url=base_url,  <span class="comment"># 与模型交互的地址</span></span><br><span class="line">    api_key=api_key  <span class="comment"># 秘钥</span></span><br><span class="line">)</span><br><span class="line">messages = [</span><br><span class="line">    <span class="comment"># 创建系统消息，定义模型的角色</span></span><br><span class="line">    SystemMessage(content=<span class="string">&quot;我是反洗钱领域的专家，我叫RiskHelper&quot;</span>),      <span class="comment"># 创建用户消息，用户的提问</span></span><br><span class="line">    HumanMessage(content=<span class="string">&quot;你好，什么是反洗钱？&quot;</span>)</span><br><span class="line">]</span><br><span class="line"><span class="comment"># 返回的类型是AI大模型消息</span></span><br><span class="line">response = chat_model.invoke(messages)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(response)) <span class="comment"># 格式是AIMessage</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-Prompt-Template（提示词模版）"><a href="#3-4-Prompt-Template（提示词模版）" class="headerlink" title="3.4 Prompt Template（提示词模版）"></a>3.4 Prompt Template（提示词模版）</h3><p><strong>Prompt（提示词）</strong>：提示词是与大模型交互时输入的内容，<strong>用来指导大模型生成特定类型的回答或执行特定的任务</strong>。它可以是一个简单的问题、一段详细的任务说明，或包含角色、背景、示例的复杂文本。其核心目的是<strong>约束行为，减少错误，引导模型生成用户期望的响应</strong>。好的提示词可以解决60%以上的模型幻觉问题，优化提示词也是我们后续开发中解决大模型幻觉最多且最有效的方式之一。</p>
+<p>如下是一个简单的提示词：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">您是一名资深LangChain框架专家，具备以下专业背景：</span></span><br><span class="line"><span class="string">- 精通LangChain 0.3.x及以上版本的核心架构</span></span><br><span class="line"><span class="string">- 熟练掌握Models、Prompts、Chains、Agents、Memory五大组件</span></span><br><span class="line"><span class="string">- 拥有实际企业级LLM应用部署经验</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">请根据用户需求提供：</span></span><br><span class="line"><span class="string">1. 架构设计建议（组件选型与组合逻辑）</span></span><br><span class="line"><span class="string">2. 代码实现方案（包含最佳实践）</span></span><br><span class="line"><span class="string">3. 性能优化策略（处理长文本/高并发场景）</span></span><br><span class="line"><span class="string">4. 错误排查指导（常见陷阱与解决方案）用户输入: &#123;input&#125;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Prompt Template（提示词模版）</strong>：固定的提示词限制了模型的灵活性和适用范围，所以 Prompt Template 是一个模板化的字符串，<strong>可以将变量（如用户提问等）插入到模板的占位符中</strong>，从而创建出不同的提示。LangChain提供了很多提示词模版，用于与大模型交互，常见的提示词模版如下：</p>
+<p><strong>1、PromptTemplate</strong>：LLM提示模板，用于生成字符串提示，生成的是单一、无角色区分的纯文本字符串。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建PromptTemplate</span></span><br><span class="line">prompt_template = PromptTemplate(</span><br><span class="line">    template=<span class="string">&quot;如何成为一个&#123;domain&#125;领域的专家&quot;</span>,</span><br><span class="line">    input_variables=[<span class="string">&quot;domain&quot;</span>]</span><br><span class="line">)</span><br><span class="line"><span class="comment"># 填充模版参数，将反洗钱填充到domain字段中</span></span><br><span class="line">messages = prompt_template.invoke(&#123;<span class="string">&quot;domain&quot;</span>: <span class="string">&quot;反洗钱&quot;</span>&#125;)</span><br><span class="line">response = chat_model.invoke(messages)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、ChatPromptTemplate</strong>：创建聊天消息列表的提示模板。<strong>生成的是结构化的消息列表，其中每条消息都带有明确的角色</strong>（如系统、用户、AI），用在对话模型中。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方式一，使用构造函数创建</span></span><br><span class="line">chatprompt_template = ChatPromptTemplate([</span><br><span class="line">    <span class="comment"># key: 角色, value: 内容,</span></span><br><span class="line">    (<span class="string">&quot;system&quot;</span>, <span class="string">&quot;你是一个反洗钱领域的专家，你的名字是&#123;name&#125;&quot;</span>),  <span class="comment"># 系统提示词</span></span><br><span class="line">    (<span class="string">&quot;human&quot;</span>, <span class="string">&quot;帮我解答一下&#123;question&#125;&quot;</span>)   <span class="comment"># 用户提示词</span></span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 填充模版参数</span></span><br><span class="line">message = chatprompt_template.<span class="built_in">format</span>(name=<span class="string">&quot;RiskHelper&quot;</span>, question=<span class="string">&quot;什么是反洗钱？&quot;</span>)</span><br><span class="line">response = chat_model.invoke(message)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方式二，使用from_messages方法创建</span></span><br><span class="line">chatprompt_template = ChatPromptTemplate.from_messages([</span><br><span class="line">    (<span class="string">&quot;system&quot;</span>, <span class="string">&quot;你是一个反洗钱领域的专家，你的名字是&#123;name&#125;&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;human&quot;</span>, <span class="string">&quot;帮我解答一下&#123;question&#125;&quot;</span>)</span><br><span class="line">])</span><br><span class="line"><span class="comment"># 填充模版参数</span></span><br><span class="line">messages = chatprompt_template.<span class="built_in">format</span>(name=<span class="string">&quot;RiskHelper&quot;</span>, question=<span class="string">&quot;什么是反洗钱？&quot;</span>)</span><br><span class="line">response = chat_model.invoke(messages)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、XxxMessagePromptTemplate</strong> ：特定角色的消息提示词模板，包括：SystemMessagePromptTemplate、HumanMessagePromptTemplate、AIMessagePromptTemplate、ChatMessagePromptTemplate等，通常用ChatPromptTemplate将消息提示词模版打包在一起，一并发送给模型。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建聊天提示词模版</span></span><br><span class="line">chatprompt_template = ChatPromptTemplate([</span><br><span class="line">    <span class="comment"># 创建系统提示词模版</span></span><br><span class="line">    SystemMessagePromptTemplate.from_template(<span class="string">&quot;你是一个反洗钱领域的专家，你的名字是&#123;name&#125;&quot;</span>),</span><br><span class="line">    <span class="comment"># 创建用户提示词模版</span></span><br><span class="line">    HumanMessagePromptTemplate.from_template(<span class="string">&quot;帮我解答一下&#123;question&#125;&quot;</span>)</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 填充模版参数</span></span><br><span class="line">message = chatprompt_template.<span class="built_in">format</span>(name=<span class="string">&quot;RiskHelper&quot;</span>, question=<span class="string">&quot;什么是反洗钱？&quot;</span>)</span><br><span class="line">response = chat_model.invoke(message)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br></pre></td></tr></table></figure>
+
+<p><strong>4、FewShotPromptTemplate</strong>：样本提示词模板，提供少量的样例作为参考来引导大模型按照特定的格式和风格输出。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 定义示例数据</span></span><br><span class="line">examples = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;question&quot;</span>: <span class="string">&quot;什么是Spring Boot？&quot;</span>,</span><br><span class="line">        <span class="string">&quot;answer&quot;</span>: <span class="string">&quot;Spring Boot是一个基于Spring框架的开源Java框架，用于简化Spring应用程序的创建和部署。&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;question&quot;</span>: <span class="string">&quot;什么是依赖注入？&quot;</span>,</span><br><span class="line">        <span class="string">&quot;answer&quot;</span>: <span class="string">&quot;依赖注入是一种设计模式，通过外部容器向对象提供其所需的依赖，而不是对象自己创建依赖。&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;question&quot;</span>: <span class="string">&quot;什么是RESTful API？&quot;</span>,</span><br><span class="line">        <span class="string">&quot;answer&quot;</span>: <span class="string">&quot;RESTful API是遵循REST架构风格的Web服务接口，使用HTTP方法进行资源操作。&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"><span class="comment"># 2. 定义示例模板</span></span><br><span class="line">example_prompt = PromptTemplate(</span><br><span class="line">    input_variables=[<span class="string">&quot;question&quot;</span>, <span class="string">&quot;answer&quot;</span>],</span><br><span class="line">    template=<span class="string">&quot;问题: &#123;question&#125;\n答案: &#123;answer&#125;&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 3. 创建few-shot提示词模版</span></span><br><span class="line">few_shot_prompt = FewShotPromptTemplate(</span><br><span class="line">    examples=examples,</span><br><span class="line">    example_prompt=example_prompt,</span><br><span class="line">    suffix=<span class="string">&quot;问题: &#123;question&#125;&quot;</span>,</span><br><span class="line">    input_variables=[<span class="string">&quot;question&quot;</span>]</span><br><span class="line">)</span><br><span class="line">formatted_prompt = few_shot_prompt.<span class="built_in">format</span>(question=<span class="string">&quot;什么是LangChain？&quot;</span>)</span><br><span class="line">response = chat_model.invoke(formatted_prompt)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br></pre></td></tr></table></figure>
+
+<p>还有一些其他的提示词模版，可以参考：<br><a target="_blank" rel="noopener" href="https://python.langchain.com.cn/docs/modules/model_io/prompts/prompt_templates/">https://python.langchain.com.cn/docs/modules/model_io/prompts/prompt_templates/</a></p>
+<h3 id="3-5-Output-Parsers（输出解析器）"><a href="#3-5-Output-Parsers（输出解析器）" class="headerlink" title="3.5 Output Parsers（输出解析器）"></a>3.5 Output Parsers（输出解析器）</h3><p>大模型通常返回的内容都是字符串格式，但是我们实际开发中更擅长处理结构化数据，输出解析器就是<strong>将大模型输出的结果转换成特定的结构化数据</strong>，以便应用程序能更方便的处理。LangChain提供了一些常见的输出解析器，如<strong>StrOutputParser</strong>（字符串解析器）、<strong>JsonOutputParser</strong>（json解析器）、<strong>CommaSeparatedListOutputParser</strong>（csv解析器）、<strong>DatetimeOutputParserde</strong>（日期解析器）、<strong>XmlOutputParser</strong>（xml解析器）等下边用<strong>JsonOutputParser</strong>写一个简单的实例</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">json_parser = JsonOutputParser()</span><br><span class="line">prompt_template = PromptTemplate(</span><br><span class="line">    template=<span class="string">&quot;用简单的一句话描述一下什么是&#123;name&#125;？请按照以下格式输出：&#123;format_instructions&#125;&quot;</span>,</span><br><span class="line">    input_variables=[<span class="string">&quot;name&quot;</span>],</span><br><span class="line">    <span class="comment"># 告诉大模型，按照json格式输出</span></span><br><span class="line">    partial_variables=&#123;<span class="string">&quot;format_instructions&quot;</span>: json_parser.get_format_instructions()&#125;</span><br><span class="line">)</span><br><span class="line">messages = prompt_template.invoke(&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;反洗钱&quot;</span>&#125;)</span><br><span class="line">response = chat_model.invoke(messages)</span><br><span class="line"><span class="built_in">print</span>(json_parser.parse(response.content))</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-6-模型的调用方式"><a href="#3-6-模型的调用方式" class="headerlink" title="3.6 模型的调用方式"></a>3.6 模型的调用方式</h3><p>Runnable 接口是使用LangChain组件的基础，它在许多组件中实现，例如语言模型、输出解析器、检索器、编译的LangGraph 图等。Runnable 方式定义了一个标准接口，允许 Runnable 组件用以下方式调用：</p>
+<p><strong>1、invoke</strong>：处理单条输入，等待模型完全处理完成后再返回结果，上述的例子都是invoke调用</p>
+<p><strong>2、stream</strong>：流式响应，逐字符输出模型的响应，类似于我们日常使用的AI应用（元宝）一样，给用户输出是逐字输出，无需等所有的结果生成后一次返回，对于用户交互体验较好。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 流式输出</span></span><br><span class="line">chat_model = ChatOpenAI(</span><br><span class="line">    model_name=model_name,</span><br><span class="line">    base_url=base_url,  <span class="comment"># 与模型交互的地址</span></span><br><span class="line">    api_key=api_key,  <span class="comment"># 秘钥</span></span><br><span class="line">    streaming=<span class="literal">True</span>   <span class="comment"># 开启流式输出</span></span><br><span class="line">)</span><br><span class="line">chatprompt_template = ChatPromptTemplate([</span><br><span class="line">    SystemMessagePromptTemplate.from_template(<span class="string">&quot;你是一个反洗钱领域的专家&quot;</span>),</span><br><span class="line">    HumanMessagePromptTemplate.from_template(<span class="string">&quot;请详细讲一下什么是&#123;value&#125;？&quot;</span>)</span><br><span class="line">])</span><br><span class="line">message = chatprompt_template.invoke(&#123;<span class="string">&quot;value&quot;</span>: <span class="string">&quot;反洗钱&quot;</span>&#125;)</span><br><span class="line"><span class="keyword">for</span> output <span class="keyword">in</span> chat_model.stream(message):</span><br><span class="line">    <span class="comment"># 逐个打印token内容</span></span><br><span class="line">    <span class="built_in">print</span>(output.content, end=<span class="string">&quot;&quot;</span>, flush=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、batch</strong>：批量处理，可以将多个消息一起发送给模型。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建三个消息</span></span><br><span class="line">message1 = [HumanMessage(content=<span class="string">&quot;什么是风控？&quot;</span>)]</span><br><span class="line">message2 = [HumanMessage(content=<span class="string">&quot;什么是反洗钱？&quot;</span>)]</span><br><span class="line">message3 = [HumanMessage(content=<span class="string">&quot;什么是EDD？&quot;</span>)]</span><br><span class="line">messages = [message1, message2, message3]</span><br><span class="line"><span class="comment"># 批量调用</span></span><br><span class="line">response = chat_model.batch(messages)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>LangChain还提供了与上边相对应的异步方法：</p>
+<ol>
+<li><strong>astream</strong>：异步流式响应</li>
+<li><strong>ainvoke</strong>：异步处理单条输入</li>
+<li><strong>abatch</strong>：异步处理批量输入</li>
+<li><strong>astream_log</strong>：异步流式返回中间步骤，以及最终响应</li>
+</ol>
+<p>如果对具体的调用方式感兴趣可以参考官方文档：LangChain-Runnable调用</p>
+<p><a target="_blank" rel="noopener" href="https://docs.langchain.com/oss/javascript/langchain/overview">https://docs.langchain.com/oss/javascript/langchain/overview</a></p>
+<h2 id="4-LangChain核心组件之Chains"><a href="#4-LangChain核心组件之Chains" class="headerlink" title="4. LangChain核心组件之Chains"></a>4. LangChain核心组件之Chains</h2><h3 id="4-1-Chain（链）概述"><a href="#4-1-Chain（链）概述" class="headerlink" title="4.1 Chain（链）概述"></a>4.1 Chain（链）概述</h3><p>链，它将多个组件（提示词模版、大模型、记忆、工具、输出解析器）串联起来，<strong>形成一个可执行的，自动化的工作流程，类似于流水线作业</strong>。它将上一个组件的输出作为下一个组件的输入，将多个步骤串连起来执行，最终将模型的响应结果返回给用户。一个小Chain可以包含提示词模版-&gt;大模型-&gt;输出解析器，一个主Chain也可以将多个子Chain串起来，比如输入一篇文章先翻译（Chain A），再总结（Chain B）。</p>
+<p><img src="https://github.com/user-attachments/assets/afb1b147-aed5-4cc2-96e6-b5be841a6838" alt="Image"></p>
+<h3 id="4-2-Chain组件使用"><a href="#4-2-Chain组件使用" class="headerlink" title="4.2 Chain组件使用"></a>4.2 Chain组件使用</h3><p><strong>1、LLMChain（已过时）</strong>：最基础的Chain，将一个提示词模板和一个大模型封装在一起，构成一个可执行的单元。适用于简单的问答、文本生成等单步任务。它的工作流程是：将用户输入的数据填充提示词模板，然后将格式化后的提示词发送给大模型，最终返回大模型的生成结果。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">chatprompt_template = ChatPromptTemplate([</span><br><span class="line">    SystemMessagePromptTemplate.from_template(<span class="string">&quot;你是一个反洗钱领域的专家，你的名字是&#123;name&#125;&quot;</span>),</span><br><span class="line">    HumanMessagePromptTemplate.from_template(<span class="string">&quot;帮我解答一下&#123;question&#125;&quot;</span>)</span><br><span class="line">])</span><br><span class="line"><span class="comment"># 创建链</span></span><br><span class="line">chain = LLMChain(llm=chat_model, prompt=chatprompt_template)</span><br><span class="line"><span class="comment"># 调用链，先执行prompt，并将结果给到llm，再执行llm，最后返回结果</span></span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;RiskHelper&quot;</span>, <span class="string">&quot;question&quot;</span>: <span class="string">&quot;什么是反洗钱？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>注意：上述是LLMChain的使用，但是LLMChain在0.1.17版本已经被标记为过时，且在1.0版本后会被移除。</p>
+<p><strong>2、SequentialChain（顺序链，已过时）</strong>：通过将多个Chain串起来，实现分步任务处理，前一个链的输出作为后一个链的输入，适用于需要分步处理的任务，如先总结再翻译。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">chatprompt_template1 = ChatPromptTemplate([</span><br><span class="line">    SystemMessagePromptTemplate.from_template(<span class="string">&quot;你是一个&#123;name&#125;领域的专家&quot;</span>),</span><br><span class="line">    HumanMessagePromptTemplate.from_template(<span class="string">&quot;请详细讲一下什么是&#123;title&#125;？&quot;</span>)</span><br><span class="line">])</span><br><span class="line">chain1 = LLMChain(llm=chat_model, prompt=chatprompt_template1, output_key=<span class="string">&quot;text&quot;</span>)</span><br><span class="line">chatprompt_template2 = ChatPromptTemplate([</span><br><span class="line">    SystemMessagePromptTemplate.from_template(<span class="string">&quot;你是一个文章总结专家&quot;</span>),</span><br><span class="line">    HumanMessagePromptTemplate.from_template(<span class="string">&quot;请帮我用一句话概括一下&#123;text&#125;&quot;</span>)</span><br><span class="line">])</span><br><span class="line">chain2 = LLMChain(llm=chat_model, prompt=chatprompt_template2, output_key=<span class="string">&quot;translation&quot;</span>)</span><br><span class="line"><span class="comment"># 构建顺序链</span></span><br><span class="line">chain = SequentialChain(</span><br><span class="line">    chains=[chain1, chain2],</span><br><span class="line">    input_variables=[<span class="string">&quot;name&quot;</span>, <span class="string">&quot;title&quot;</span>],</span><br><span class="line">    output_variables=[<span class="string">&quot;translation&quot;</span>]</span><br><span class="line">)</span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;反洗钱&quot;</span>, <span class="string">&quot;title&quot;</span>: <span class="string">&quot;EDD&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>SequentialChain也在0.1.17版本被标记为过时，且在1.0版本后会被移除</p>
+<p><strong>3、LCEL（LangChain Expression Language，推荐使用的方式）</strong>：是 LangChain 框架中用于构建和组合Chain的一种声明式、模块化且高效的语言。类似于Linux中的管道符 | ，将提示模板、语言模型、输出解析器等组件灵活地组合成可执行的工作流。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">json_parser = JsonOutputParser()</span><br><span class="line">prompt_template = PromptTemplate(</span><br><span class="line">    template=<span class="string">&quot;用简单的一句话描述一下什么是&#123;name&#125;？请按照以下格式输出：&#123;format_instructions&#125;&quot;</span>,</span><br><span class="line">    input_variables=[<span class="string">&quot;name&quot;</span>],</span><br><span class="line">    <span class="comment"># 告诉大模型，按照json格式输出</span></span><br><span class="line">    partial_variables=&#123;<span class="string">&quot;format_instructions&quot;</span>: json_parser.get_format_instructions()&#125;</span><br><span class="line">)</span><br><span class="line"><span class="comment"># 使用管道符构建chain</span></span><br><span class="line">chain = prompt_template | chat_model | json_parser</span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;反洗钱&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>除了上述的chain之外，LangChain还提供了以下类型的chain。</p>
+<ol>
+<li><strong>LLMMathChain（数学链）</strong>：将用户问题转换为数学问题，再转换为可以使用Python的numexpr库执行的表达式。</li>
+<li><strong>RouterChain（路由链）</strong>：根据输入内容分析并决定调用哪个专用的子链处理。可以自动分析用户的需求，然后路由到最适合的链中执行，并返回最终结果。</li>
+<li><strong>StuffDocumentsChain（文档链）</strong>：将多个文档内容合并 （“填充”或“塞入”）到单个提示词中，然后调用大模型进行处理。</li>
+</ol>
+<h2 id="5-LangChain核心组件之Memory"><a href="#5-LangChain核心组件之Memory" class="headerlink" title="5. LangChain核心组件之Memory"></a>5. LangChain核心组件之Memory</h2><h3 id="5-1-Memory（记忆）概述"><a href="#5-1-Memory（记忆）概述" class="headerlink" title="5.1 Memory（记忆）概述"></a>5.1 Memory（记忆）概述</h3><p>我们知道，<strong>大模型本身都不会记忆任何上下文信息</strong>，那为什么我们常用的大模型应用能够清楚的知道我们之前的对话内容（与AI应用可以进行多轮对话）？并且有一定的记忆能力，这就需要额外的模块去保存我们和大模型进行对话的上下文信息，然后在下一次对话前将历史的记录全部发送给大模型，提供给大模型参考以便能够更准确的回答当前的提问。</p>
+<p>在LangChain中，这个用于存储用户和模型交互的历史信息的组件叫Memory，它能够让应用记住用户之前说了什么，从而实现对话的上下文感知能力，为构建真正智能和上下文感知的链式对话系统提供了基础。</p>
+<h3 id="5-2-Memory的原理"><a href="#5-2-Memory的原理" class="headerlink" title="5.2 Memory的原理"></a>5.2 Memory的原理</h3><p><img src="https://github.com/user-attachments/assets/4168175f-531f-48fd-8744-264d615b47b7" alt="Image"></p>
+<p>STEP1：用户输入问题<br>STEP2：从Memory中读取历史消息<br>STEP3：构建新的提示词，包含历史消息和当前的提问<br>STEP4：发送给大模型处理<br>STEP5：解析大模型输出，并返回用户<br>STEP6：将历史对话和当前对话一起保存在Memory中，以便下一次使用</p>
+<h3 id="5-3-Memory组件使用"><a href="#5-3-Memory组件使用" class="headerlink" title="5.3 Memory组件使用"></a>5.3 Memory组件使用</h3><p>LangChain中提供了一系列的Memory用于保存历史上下文，不同的Memory保存的内容也不一样，常用的使用方式如下：</p>
+<p><strong>1、ChatMessageHistory</strong>：用于存储和管理对话消息的基础类，它直接操作消息对象（如HumanMessage, AIMessage 等），是其它记忆组件的底层存储工具。特点：轻量、无需额外依赖、数据不会持久化（程序重启后丢失）。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建Memory</span></span><br><span class="line">history = ChatMessageHistory()</span><br><span class="line"><span class="comment"># 添加用户消息</span></span><br><span class="line">history.add_user_message(<span class="string">&quot;你好，我是RiskHelper&quot;</span>)</span><br><span class="line"><span class="comment"># 添加AI消息</span></span><br><span class="line">history.add_ai_message(<span class="string">&quot;我是DeepSeek大模型&quot;</span>)</span><br><span class="line"><span class="comment"># 添加用户消息</span></span><br><span class="line">history.add_user_message(<span class="string">&quot;我是谁？&quot;</span>)</span><br><span class="line"><span class="comment"># 通过将history.messages 直接传入大模型，大模型能够看到完整的对话上下文，从而实现有记忆的连续对话</span></span><br><span class="line">response = chat_model.invoke(history.messages)</span><br><span class="line"><span class="built_in">print</span>(response.content)</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、ConversationBufferMemory</strong>：是LangChain中最基础、最直接的记忆组件，<strong>按顺序完整地记录用户与AI之间的每一轮对话</strong>，并将这些历史信息提供给模型，以实现连贯的多轮对话。<strong>他能保存全部的上下文信息，对话连贯性最强，但是会消耗大量的Token，且随着对话的进行，会占用大量的内存资源</strong>。它适用于短对话，需要保存完整的上下文信息的复杂任务。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">prompt_template = PromptTemplate.from_template(</span><br><span class="line">  <span class="string">&quot;历史对话: &#123;history&#125;，当前问题: &#123;input&#125;&quot;</span></span><br><span class="line">)</span><br><span class="line">memory = ConversationBufferMemory(memory_key=<span class="string">&quot;history&quot;</span>)</span><br><span class="line">chain = LLMChain(llm=chat_model, prompt=prompt_template, memory=memory)</span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;用简单一句话描述什么是LangChain？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;==============================================================&quot;</span>)</span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;如何使用它？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、ConversationBufferWindowMemory</strong>：只保留最近 K 轮对话，解决ConversationBufferMemory占用内存多、tokken消耗大问题，平衡连贯性与资源消耗。随之带来的问题是会丢失早期上下文，不适合复杂场景。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">prompt_template = PromptTemplate.from_template(</span><br><span class="line">  <span class="string">&quot;历史对话: &#123;history&#125;，当前问题: &#123;input&#125;&quot;</span></span><br><span class="line">)</span><br><span class="line">memory = ConversationBufferWindowMemory(memory_key=<span class="string">&quot;history&quot;</span>, k=<span class="number">10</span>) <span class="comment"># k表示保留的对话轮数</span></span><br><span class="line">chain = LLMChain(llm=chat_model, prompt=prompt_template, memory=memory)</span><br><span class="line">response = chain.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;用简单一句话描述什么是LangChain？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>4、ConversationSummaryMemory</strong>：它是 LangChain 中一种智能的记忆管理组件，它通过自动生成对话摘要来解决长对话上下文管理的问题。与简单截断历史的记忆类型不同，<strong>它使用大模型来提炼对话精髓，实现长期记忆</strong>。核心思想是：<strong>不存储原始对话记录，而是存储对话的智能摘要</strong>。当新的对话发生时，系统会将现有摘要与最新对话结合，生成更新的摘要。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">history = ChatMessageHistory()</span><br><span class="line">history.add_ai_message(<span class="string">&quot;你好，我是RiskHelper&quot;</span>)</span><br><span class="line">history.add_user_message(<span class="string">&quot;你好，什么是反洗钱？&quot;</span>)</span><br><span class="line">history.add_user_message(<span class="string">&quot;你好，什么是风控”&quot;</span>)</span><br><span class="line">memory = ConversationSummaryMemory.from_messages(llm=chat_model,chat_memory=history)</span><br><span class="line"><span class="built_in">print</span>(memory.load_memory_variables(&#123;&#125;))</span><br></pre></td></tr></table></figure>
+
+<p><strong>5、ConversationSummaryBufferMemory</strong>：是LangChain中一种非常实用的混合型记忆组件，它巧妙地<strong>将对话摘要与原始对话缓冲区结合起来，旨在解决长对话场景下既要保持上下文连贯性又要控制资源消耗的核心矛盾</strong>。其核心创新在于采用了分层记忆管理策略，在对话连贯性和资源消耗之间找到平衡点。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">memory = ConversationSummaryBufferMemory(</span><br><span class="line">  llm=chat_model,</span><br><span class="line">  max_token_limit=<span class="number">100</span>,</span><br><span class="line">  return_messages=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line">memory.save_context(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;你好，我是RiskHelper&quot;</span>&#125;,&#123;<span class="string">&quot;output&quot;</span>: <span class="string">&quot;你好，我是DeepSeek大模型&quot;</span>&#125;)</span><br><span class="line">memory.save_context(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;你好，什么是反洗钱？&quot;</span>&#125;,&#123;<span class="string">&quot;output&quot;</span>: <span class="string">&quot;反洗钱是指对洗钱犯罪的预防和打击措施&quot;</span>&#125;)</span><br><span class="line">memory.save_context(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;你好，什么是风控？&quot;</span>&#125;,&#123;<span class="string">&quot;output&quot;</span>: <span class="string">&quot;风控是指对风险的控制措施&quot;</span>&#125;)</span><br><span class="line">memory.save_context(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;你好，EDD？&quot;</span>&#125;,&#123;<span class="string">&quot;output&quot;</span>: <span class="string">&quot;EDD是指对客户身份的识别措施&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(memory.load_memory_variables(&#123;&#125;))</span><br></pre></td></tr></table></figure>
+
+<p>注意： 有些模型（如Deepseek）没提供get_num_tokens_from_messages（计算token）函数，执行时会报错，解决办法继承ChatOpenAI，然后实现get_num_tokens_from_messages函数：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建一个继承于ChatOpenAI的类，并实现get_num_tokens_from_messages方法</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DeepSeekChatOpenAI</span>(<span class="title class_ inherited__">ChatOpenAI</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_num_tokens_from_messages</span>(<span class="params">self, messages: <span class="type">List</span>[BaseMessage]</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        <span class="comment">#实现get_num_tokens_from_messages方法，返回消息的token数量</span></span><br><span class="line">        total_tokens = <span class="number">100</span> <span class="comment"># 自定义函数</span></span><br><span class="line">        <span class="keyword">return</span> total_tokens;</span><br><span class="line">chat_model = DeepSeekChatOpenAI(</span><br><span class="line">    model_name=model_name,</span><br><span class="line">    base_url=base_url,</span><br><span class="line">    api_key=api_key</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>除了上述介绍的Memory之外，LangChain还提供了一下其他的Memory：</p>
+<p><strong>6、ConversationEntityMemory</strong>：一种基于实体的对话记忆机制，它能够智能地识别、存储和利用对话中出现的实体信息（如人名、地点、产品等）及其属性&#x2F;关系，并结构化存储，使 AI 具备更强的上下文理解和记忆能力，能够解决信息过载问题。</p>
+<p><strong>7、ConversationKGMemory</strong>： 一种基于知识图谱的先进记忆组件，它将对话内容组织成结构化的知识图谱，实现更加语义化和关联性的记忆管理。</p>
+<p><strong>8、VectorStoreRetrieverMemory</strong>：一种基于向量数据库的先进记忆组件，它利用语义相似度检索技术，从大量历史对话中智能召回与当前对话最相关的记忆片段。</p>
+<h2 id="6-LangChain核心组件之Tools"><a href="#6-LangChain核心组件之Tools" class="headerlink" title="6. LangChain核心组件之Tools"></a>6. LangChain核心组件之Tools</h2><h3 id="6-1-Tools概述"><a href="#6-1-Tools概述" class="headerlink" title="6.1 Tools概述"></a>6.1 Tools概述</h3><p>Tools是大模型、智能体（Agent）与外部世界进行交互的核心组件，本质上是<strong>封装了一些特定功能的可调用的函数（数学计算、获取时间、搜索等）</strong>， 允许大模型与外部系统、API、数据源和工具进行交互，其核心价值在于极大地扩展了 LLM 应用的能力边界（动作）。</p>
+<p><img src="https://github.com/user-attachments/assets/484fb99e-e988-4f22-9cc6-76b45d907475" alt="Image"></p>
+<p><img src="https://github.com/user-attachments/assets/f8d37bec-199f-4a1d-a4fe-f7894e0d7ff9" alt="Image"></p>
+<h3 id="6-2-Tools组件使用"><a href="#6-2-Tools组件使用" class="headerlink" title="6.2 Tools组件使用"></a>6.2 Tools组件使用</h3><p>Tool 通常包含如下几个要素：</p>
+<ol>
+<li>工具名称 - 工具的唯一标识，通常是函数名，也可以自定义</li>
+<li>工具描述 - 工具的功能说明，应当清晰准确的描述工具的作用、使用场景等，直接决定Agent是否会使用这个工具</li>
+<li>参数定义 - 每个参数的名称、类型、描述、是否必需</li>
+<li>返回类型 - 工具返回的数据类型</li>
+<li>执行逻辑 - 实际的代码实现</li>
+</ol>
+<p>使用流程：</p>
+<p><img src="https://github.com/user-attachments/assets/7bc47bdb-d106-4e9a-b1ce-1f413e90c78a" alt="Image"></p>
+<p>STEP1-工具创建：使用@tool注解创建工具。</p>
+<p>STEP2-工具绑定：将创建的工具绑定到Agent上（可以绑定多个），包括工具的名称、描述、参数、返回等，让Agent知道有哪些工具可用。</p>
+<p>STEP3-工具调用：模型返回调用具体的工具后，Agent根据该工具的参数描述构造参数，并发起调用</p>
+<p>STEP4-工具执行：执行工具的具体逻辑，并返回结果。</p>
+<p><strong>两种自定义工具的方式：</strong></p>
+<p><strong>方式一：@tool装饰器</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@tool(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># 指定工具的名称，这是 Agent 识别和调用工具时使用的标识符。</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># 默认值：如果不指定，默认使用函数名作为工具名称。</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    name_or_callable=<span class="string">&quot;multiply&quot;</span>,  <span class="comment">#</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># 用于告诉 Agent 这个工具的功能和用途。这对 Agent 选择合适的工具至关重要。</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># 默认值：如果不指定，会尝试使用函数的文档字符串（docstring）作为描述。如果文档字符串也没有，则为空字符串。</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    description=<span class="string">&quot;Multiply two numbers&quot;</span>,</span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># 控制工具执行结果的返回方式</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># True：工具的输出直接作为 Agent 的最终回答返回给用户</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    <span class="comment"># False：工具的输出会传递给 Agent，由 Agent 进一步处理或与其他信息结合后再回答</span></span></span></span><br><span class="line"><span class="params"><span class="meta">    return_direct=<span class="literal">True</span></span></span></span><br><span class="line"><span class="params"><span class="meta"></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">multiply</span>(<span class="params">a: <span class="built_in">int</span>, b: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;Multiply a and b.&quot;&quot;&quot;</span>  <span class="comment"># 如果不指定description，这会成为工具描述</span></span><br><span class="line">    <span class="keyword">return</span> a * b</span><br><span class="line">response = multiply.invoke(&#123;<span class="string">&quot;a&quot;</span>: <span class="number">2</span>, <span class="string">&quot;b&quot;</span>: <span class="number">3</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>方式二：StructuredTool的from_function()</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">multiply = StructuredTool.from_function(</span><br><span class="line">    <span class="comment"># 绑定函数</span></span><br><span class="line">    func=multiply,</span><br><span class="line">    <span class="comment"># 指定工具的名称，这是 Agent 识别和调用工具时使用的标识符。</span></span><br><span class="line">    name=<span class="string">&quot;multiply&quot;</span>,</span><br><span class="line">    <span class="comment"># 用于告诉 Agent 这个工具的功能和用途。这对 Agent 选择合适的工具至关重要。</span></span><br><span class="line">    description=<span class="string">&quot;Multiply two numbers&quot;</span></span><br><span class="line">)</span><br><span class="line">response = multiply.invoke(&#123;<span class="string">&quot;a&quot;</span>: <span class="number">2</span>, <span class="string">&quot;b&quot;</span>: <span class="number">3</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>结合大模型使用：</strong></p>
+<p>注意：tool一般与agent一起配合使用，agent在下一章详细介绍</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将函数封装为LangChain工具对象</span></span><br><span class="line">stock_tool = Tool(</span><br><span class="line">    name=<span class="string">&quot;getStockPrice&quot;</span>,  <span class="comment"># 工具名称（模型将使用此名称调用工具）</span></span><br><span class="line">    func=getStockPrice,  <span class="comment"># 工具函数</span></span><br><span class="line">    description=<span class="string">&quot;用于查询公司股票价格。输入应该是公司名称（如：腾讯）&quot;</span></span><br><span class="line">    <span class="comment"># 工具描述（模型根据此决定是否调用）</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 创建工具列表（Agent可以使用的所有工具）</span></span><br><span class="line">tools = [stock_tool]</span><br><span class="line"><span class="comment"># 将LangChain工具转换为OpenAI函数调用格式</span></span><br><span class="line">functools = [convert_to_openai_tool(tool) <span class="keyword">for</span> tool <span class="keyword">in</span> tools]</span><br><span class="line"><span class="comment"># 从LangChain Hub加载预定义的提示模板</span></span><br><span class="line"><span class="comment"># &#x27;hwchase17/structured-chat-agent&#x27;是一个专门为结构化聊天Agent设计的提示模板</span></span><br><span class="line">prompt = hub.pull(<span class="string">&#x27;hwchase17/structured-chat-agent&#x27;</span>)</span><br><span class="line"><span class="comment"># 创建结构化聊天Agent，# 参数：模型对象、工具列表、提示模板</span></span><br><span class="line">agent = create_structured_chat_agent(chat_model, tools, prompt)</span><br><span class="line"><span class="comment"># 创建Agent执行器</span></span><br><span class="line">agent_executor = AgentExecutor(</span><br><span class="line">    agent=agent,                <span class="comment"># 配置好的Agent</span></span><br><span class="line">    tools=tools,                <span class="comment"># Agent可用的工具列表</span></span><br><span class="line">    verbose=<span class="literal">True</span>,               <span class="comment"># 开启详细日志（显示Agent思考过程）</span></span><br><span class="line">    handle_parsing_errors=<span class="literal">True</span>  <span class="comment"># 处理解析错误（防止因格式问题崩溃）</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 执行Agent查询</span></span><br><span class="line">response = agent_executor.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;查询腾讯当日的股票价格&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>注意：实际使用过程中发现，有时候并没有调用自定义的工具，可能原因是：</p>
+<ol>
+<li><strong>大模型认为这个计算太简单（1+1），无需调用工具。</strong></li>
+<li><strong>工具的描述不清楚，大模型无法推断出使用这个工具。</strong></li>
+<li><strong>有些模型对于工具调用支持度不高，如DeepSeek-R1。</strong></li>
+</ol>
+<p><strong>具体可通过修改工具描述、提示词或换一个模型等引导模型决定调用自定义工具。</strong></p>
+<h3 id="6-3-MCP-Server"><a href="#6-3-MCP-Server" class="headerlink" title="6.3 MCP Server"></a>6.3 MCP Server</h3><p>Agent tools可以看做是实现在AI Agent应用中的一系列函数，但是很多Tool 的功能比较通用，如浏览网页，发送消息，天气查询等，所以将通用的工具封装成一个单独的服务，就可以供不同的Agent使用了，这个单独的服务叫MCP Server，<strong>其中MCP是一个通讯协议，用来规范Agent 和MCP Server之间是怎么交互的</strong>，如工具的功能，描述，参数等。MCP Server可以与Agent部署在同一台机器上通过标准输入输出通讯，也可以部署在网络上通过http协议通讯。<strong>虽然MCP是为了大模型而制定的标准，但实际上MCP本身和大模型没有关系，它并不关心Agent使用哪个模型，MCP只负责帮Agent管理工具、资源和提示词。</strong></p>
+<p>LangChain中的Tool 和 MCP Server比较：</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>内置Tools</th>
+<th>MCP Server</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>部署位置</td>
+<td>Agent 内部（同一进程）</td>
+<td>独立服务（独立进程&#x2F;网络）</td>
+</tr>
+<tr>
+<td>代码耦合</td>
+<td>紧耦合（直接引用）</td>
+<td>松耦合（协议通信）</td>
+</tr>
+<tr>
+<td>复用性</td>
+<td>仅当前 Agent 可用</td>
+<td>多个 Agent 可共享</td>
+</tr>
+<tr>
+<td>更新维护</td>
+<td>修改需重新编译 Agent</td>
+<td>修改需重新编译 Agent 独立更新</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>本地调用，极快</td>
+<td>需要网络&#x2F;IPC通信</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>简单、专用工具</td>
+<td>通用、复杂工具</td>
+</tr>
+</tbody></table>
+<h2 id="7-LangChain核心组件之Agent"><a href="#7-LangChain核心组件之Agent" class="headerlink" title="7. LangChain核心组件之Agent"></a>7. LangChain核心组件之Agent</h2><h3 id="7-1-Agent（智能体）概述"><a href="#7-1-Agent（智能体）概述" class="headerlink" title="7.1 Agent（智能体）概述"></a>7.1 Agent（智能体）概述</h3><p><img src="https://github.com/user-attachments/assets/8df80891-6f0f-4a59-b3be-a90d91adc4e2" alt="Image"></p>
+<p>Agent（智能体）是一个通过动态协调大模型（LLM）和 工具（Tools）来完成复杂任务的智能系统（思考、分析、拆解任务、逐步实现）。<strong>它让大模型充当”决策大脑”，根据用户输入自主选择和执行工具</strong>（如搜索、计算、数据库查询等），最终生成精准的响应。2025年也被称为Agent元年，<strong>标志着人工智能正式从“思考与对话” 转向 “自主决策与行动”。</strong></p>
+<p>一个Agent应该具备以下核心能力：</p>
+<p><img src="https://github.com/user-attachments/assets/3b2daa77-95c3-4e8a-9e94-192305396518" alt="Image"></p>
+<ol>
+<li><strong>大模型（LLM）</strong>：作为大脑，提供推理、知识理解和逻辑判断能力。</li>
+<li><strong>记忆（Memory）</strong>：用于保持Agent的上下文信息，具备短期记忆（上下文）和长期记忆（向量存储），支持快速知识检索。使交互具有连续性。</li>
+<li><strong>工具（Tools）</strong>：扩展Agent的能力边界，通过调用外部工具（搜索、数据库等）Agent可以获取实时信息，弥补自身的功能局限性。</li>
+<li><strong>规划（Planning）</strong>：将具体的任务分解，并具备反思和调整能力，当效果不符合预期时，能够重新规划方案并执行，确保目标最终实现。</li>
+<li><strong>行动（Action）</strong>：实际执行决策的能力。比如：检索、推理、编程</li>
+<li><strong>协作（cooperation）</strong>：单一的Agent功能通常是有限的，而复杂问题往往需要不同的专业知识的Agent协同解决，不同Agent之间通过A2A协议交互。</li>
+</ol>
+<p><strong>通用人工智能（AGI）将是AI的终极形态（这天是否会到来？不止是技术的突破，还有伦理、法律、社会认知等）。同样，构建智能体（Agent）则是AI工程应用当下的“终极形态”。</strong></p>
+<p><img src="https://github.com/user-attachments/assets/3ea4a9a7-b623-45bc-9cb8-9cad52e8483c" alt="Image"></p>
+<h3 id="7-2-Agent-Types（运行模式）"><a href="#7-2-Agent-Types（运行模式）" class="headerlink" title="7.2 Agent Types（运行模式）"></a>7.2 Agent Types（运行模式）</h3><p>在 LangChain 中，Agent是一种由大模型驱动的组件，能够根据用户的输入动态决定执行哪些操作（如调用工具、访问数据等）。不同的 Agent 类型对应不同的决策逻辑和策略，适用于不同的任务场景。</p>
+<p><strong>1、Function Calling</strong>：是让LLM学会“使用工具”。预先定义好一系列函数（如get_weather， search_web），并明确描述它们的功能和参数。当用户提问时，将用户提问以及工具信息（工具描述、参数等关键信息）一起发送给大模型，<strong>大模型不直接生成答案，而是判断是否需要调用这些函数，以及如何调用，并将函数参数，函数名等信息以结构化的格式返回</strong>（如JSON格式）。</p>
+<p>a. 关键点：LLM本身不执行函数代码，它只负责规划。实际执行由Agent完成 。<br>b. 应用场景：适合用于获取实时数据（天气、股价）、查询数据库、执行计算或调用任何外部API等</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">OpenAI函数调用Agent</span></span><br><span class="line"><span class="string">特点：1、使用OpenAI的函数调用功能，支持结构化工具调用 2、性能最佳，响应速度快，工具调用准确性高 3、支持并行工具调用，可同时执行多个工具 4、原生支持JSON格式的参数传递</span></span><br><span class="line"><span class="string">适用场景：1、需要高精度工具调用的应用 2、对响应速度有要求的生产环境 3、需要复杂参数传递的工具集成 4、推荐作为首选Agent类型</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">AgentType.OPENAI_FUNCTIONS</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">OpenAI多函数调用Agent - 高级功能</span></span><br><span class="line"><span class="string">特点：1、支持复杂的多步骤工具调用链 2、能够处理工具间的依赖关系 3、支持条件分支和循环调用 4、具备更强的推理和规划能力</span></span><br><span class="line"><span class="string">适用场景： 1、需要多步骤复杂任务处理 2、工具间存在依赖关系的场景 3、需要动态决策和分支处理 4、复杂的业务流程自动化</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">AgentType.OPENAIMULTI_FUNCTIONS</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、ReAct模式（思考与行动）</strong></p>
+<p><img src="https://github.com/user-attachments/assets/68844d0f-c9be-410e-ac73-3206122fa3f2" alt="Image"></p>
+<p>将复杂任务拆解成，<strong>Thought (推理) → Action (行动，即调用工具) → Observation (观察结果) → … → Final Answer</strong>（<strong>最终答案</strong>）的循环步骤：</p>
+<p>a. <strong>Thought（思考）</strong>：大模型首先会分析当前情况，并思考下一步应该做什么以及为什么这么做。</p>
+<p>b. <strong>Action（行动）</strong>：根据思考的结果，判断是否需要调用工具，以及调用哪个工具，并生成相应的调用参数，发起工具调用。</p>
+<p>c. <strong>Observation（观察）</strong>：查看工具执行的结果，判断是否成功等。如调用写文件工具，会判断文件是否写入成功。</p>
+<p>d. <strong>Final Answer（最终答案）</strong>：如果任务已经成功或达到执行次数，则会生成最终答案，否则继续进行“思考-行动-观察”循环步骤。</p>
+<p>ReAct的工作原理：<strong>大模型本身不具备此流程（Thought-Action-Observation），实际是根据预先设定好的系统提示词来执行上述步骤的</strong>，如下是一个ReAct的系统提示词（hwchase17&#x2F;react）：</p>
+<p><img src="https://github.com/user-attachments/assets/38bc5944-fff0-46b6-b6f8-4a56b8c615d3" alt="Image"></p>
+<p>LangChain中ReAct的类型：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">零样本ReAct描述Agent</span></span><br><span class="line"><span class="string">特点：1、基于ReAct（Reasoning + Acting）模式 2、通过&quot;思考-行动-观察&quot;的循环进行推理 3、不需要示例，完全依赖工具描述 4、具有良好的可解释性和透明度</span></span><br><span class="line"><span class="string">适用场景：1、需要清晰推理过程的应用 2、工具描述详细且准确的场景 3、对可解释性有要求的业务场景 4、适合调试和问题排查</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">AgentType.ZERO_SHOT_REACT_DESCRIPTION</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">结构化聊天零样本ReAct Agent</span></span><br><span class="line"><span class="string">特点：1、结合了结构化输出和ReAct推理模式 2、支持更复杂的工具参数传递 3、具备更好的多轮对话能力 4、输出格式更加规范和可解析</span></span><br><span class="line"><span class="string">适用场景：1、需要结构化输出的聊天应用 2、复杂参数的工具调用场景 3、多轮对话中的工具使用 4、需要格式化响应的业务场景</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">对话式ReAct Agent</span></span><br><span class="line"><span class="string">特点：1、具备对话记忆能力，能记住历史交互 2、基于ReAct模式进行推理和行动 3、支持上下文相关的工具调用 4、适合长期对话和任务跟踪</span></span><br><span class="line"><span class="string">适用场景：1、需要维护对话状态的应用 2、长期任务跟踪和管理 3、个性化服务和推荐 4、客户服务和技术支持场景</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">AgentType.CONVERSATIONAL_REACT_DESCRIPTION</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-3-ReAct-Agent-结合大模型使用"><a href="#7-3-ReAct-Agent-结合大模型使用" class="headerlink" title="7.3 ReAct Agent 结合大模型使用"></a>7.3 ReAct Agent 结合大模型使用</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 创建Tavily搜索工具实例，用于为Agent提供实时网络搜索能力</span></span><br><span class="line"><span class="comment"># 需要在https://tavily.com/ 申请API key 才能使用</span></span><br><span class="line">search_tool = TavilySearchResults(</span><br><span class="line">    max_results=<span class="number">3</span>,</span><br><span class="line">    description=<span class="string">&quot;用于搜索最新网页信息、新闻和历史数据。输入应该是明确的搜索查询。&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 从LangChain Hub拉取预定义的ReAct提示词模板</span></span><br><span class="line">prompt = hub.pull(<span class="string">&quot;hwchase17/react&quot;</span>)</span><br><span class="line"><span class="comment"># 创建ReAct Agent实例</span></span><br><span class="line">agent = create_react_agent(</span><br><span class="line">    llm=chat_model,</span><br><span class="line">    prompt=prompt,</span><br><span class="line">    tools=[search_tool]</span><br><span class="line">)</span><br><span class="line"><span class="comment"># 创建Agent执行器</span></span><br><span class="line">agent_executor = AgentExecutor(</span><br><span class="line">    agent=agent,</span><br><span class="line">    handle_parsing_errors=<span class="literal">True</span>,  <span class="comment"># 自动处理解析错误，提高稳定性</span></span><br><span class="line">    verbose=<span class="literal">True</span>,                <span class="comment"># 开启详细日志，显示推理过程</span></span><br><span class="line">    tools=[search_tool]          <span class="comment"># 工具列表，必须与Agent中的工具保持一致</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 执行Agent任务</span></span><br><span class="line">response = agent_executor.invoke( &#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;2021年2月5日腾讯收盘价是多少？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/user-attachments/assets/f32433ce-4ddc-4182-845f-879134d7b83a" alt="Image"></p>
+<h3 id="7-4-FUNCTION-CALL-结合大模型、Memory-使用"><a href="#7-4-FUNCTION-CALL-结合大模型、Memory-使用" class="headerlink" title="7.4 FUNCTION_CALL 结合大模型、Memory 使用"></a>7.4 FUNCTION_CALL 结合大模型、Memory 使用</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建Tavily搜索工具实例</span></span><br><span class="line">search_tool = TavilySearchResults(</span><br><span class="line">    max_results=<span class="number">3</span>, <span class="comment"># 限制搜索结果数量，平衡信息完整性和处理效率</span></span><br><span class="line">    description=<span class="string">&quot;用于搜索最新网页信息、新闻和历史数据。输入应该是明确的搜索查询。&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 定义工具列表，可以添加多个</span></span><br><span class="line">tools = [search_tool]</span><br><span class="line"><span class="comment"># 创建提示词模板</span></span><br><span class="line">prompt = ChatPromptTemplate.from_messages([</span><br><span class="line">    (<span class="string">&quot;system&quot;</span>, <span class="string">&quot;你是一个人工智能小助手，可以回答问题并使用工具。&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;placeholder&quot;</span>, <span class="string">&quot;&#123;chat_history&#125;&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;human&quot;</span>, <span class="string">&quot;&#123;input&#125;&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;placeholder&quot;</span>, <span class="string">&quot;&#123;agent_scratchpad&#125;&quot;</span>)</span><br><span class="line">])</span><br><span class="line"><span class="comment"># 创建对话缓冲记忆实例</span></span><br><span class="line">memory = ConversationBufferMemory(</span><br><span class="line">    memory_key=<span class="string">&quot;chat_history&quot;</span>,</span><br><span class="line">    return_messages=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line"><span class="comment"># 创建工具调用Agent实例</span></span><br><span class="line">agent = create_tool_calling_agent(chat_model, tools, prompt)</span><br><span class="line"><span class="comment"># 创建Agent执行器</span></span><br><span class="line">agent_executor = AgentExecutor(</span><br><span class="line">    agent=agent,</span><br><span class="line">    tools=tools,</span><br><span class="line">    memory=memory,</span><br><span class="line">    handle_parsing_errors=<span class="literal">True</span>,</span><br><span class="line">    verbose=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line">response = agent_executor.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;2021年2月5日腾讯收盘价是多少？&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br><span class="line">response = agent_executor.invoke(&#123;<span class="string">&quot;input&quot;</span>: <span class="string">&quot;阿里呢？&quot;</span>&#125;)</span><br><span class="line"><span class="comment"># 嵌入Memory，可以推断出问的股价，</span></span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/user-attachments/assets/f935b6ba-b759-4029-b2c4-62c2660e1e02" alt="Image"></p>
+<h2 id="8-LangChain核心组件之Retrieval"><a href="#8-LangChain核心组件之Retrieval" class="headerlink" title="8. LangChain核心组件之Retrieval"></a>8. LangChain核心组件之Retrieval</h2><h3 id="8-1-Retrieval（检索）概述"><a href="#8-1-Retrieval（检索）概述" class="headerlink" title="8.1 Retrieval（检索）概述"></a>8.1 Retrieval（检索）概述</h3><p>Retrieval是用于从大量的文档或数据源中查找相关信息的核心模块，它是构建RAG（检索增强生成）的基础，能够让大模型访问外部知识源，解决模型本身的知识局限性和时效性问题。</p>
+<h3 id="8-2-大模型幻觉"><a href="#8-2-大模型幻觉" class="headerlink" title="8.2 大模型幻觉"></a>8.2 大模型幻觉</h3><p>我们知道大模型有两个主要的特点：</p>
+<ol>
+<li><strong>知识冻结</strong>：大模型在训练完成后，<strong>其内部知识就”冻结”在训练时的状态</strong>，并且无法获取或学习训练数据截止日期之后的新信息。</li>
+<li><strong>大模型幻觉</strong>：生成看似合理但实际错误、虚构或不存在的信息的现象（例如：9.11 &gt; 9.9）。</li>
+</ol>
+<p>虽然记忆机制扩展了AI工程的应用场景，但大模型在专业领域仍面临显著挑战，由于无法掌握全部专业知识，<strong>大模型在回答专业问题时可能生成不准确甚至完全错误的内容</strong>，这个现象被称为“幻觉”。尤其在金融、医疗等高要求领域，一次错误的金额评估或医疗诊断失误都是致命的，对于非专业人士来说可能难以辨识。当前还没彻底解决这个问题的方案，不过大家普遍达成共识的一个方案：</p>
+<ol>
+<li>为大模型提供一定的上下文信息，让其输出会变得更稳定。</li>
+<li>利用RAG（检索增强生成）技术，将专业领域的知识检索出来和提示词一起发送给大模型，以便模型能生成更可靠的答案。</li>
+</ol>
+<h3 id="8-3-RAG解决方案"><a href="#8-3-RAG解决方案" class="headerlink" title="8.3 RAG解决方案"></a>8.3 RAG解决方案</h3><p>在利用大模型处理特定领域的大规模知识问答时，除了微调模型之外，检索增强生成（RAG）是一个有效的缓解大模型幻觉问题的解决方案。<strong>RAG通过引入外部知识检索机制，在生成前为模型提供相关的实时、专有信息作为上下文，从而直接应对其固有的“幻觉”问题和知识更新瓶颈。</strong></p>
+<p><strong>RAG流程：</strong></p>
+<p><img src="https://github.com/user-attachments/assets/e88c599c-52b9-4a5e-8ff1-5e6e2aad5210" alt="Image"></p>
+<p><img src="https://github.com/user-attachments/assets/63e82ea6-3935-48b6-8998-c6e9f7dae2d2" alt="Image"></p>
+<p>1、文件解析：解析各种格式的文件并提取出文字。<br>2、文件切割：把长文本切割成更小的、有逻辑的片段。<br>3、向量化：将文字片段转换为高纬空间中的向量数字。<br>4、知识入库：将这些向量数字存进向量数据库中<br>5、用户提问：用户发起提问<br><strong>6、检索</strong>：基于各种算法（余弦相似度、欧氏距离、点积等）去向量数据库里快速找出和问题最相关的几个文本片段。<br>7、知识重排序：对找出的片段进行梳理排序，找出相似度最高的。<br><strong>8、增强</strong>：把选好的知识片段和用户的问题打包在一起交给大模型。<br><strong>9、生成</strong>：大模型生成一个准确且相关的回答。</p>
+<p>其中第689是RAG步骤中的检索、增强、生成。这里有三个位置涉及到大模型的使用：</p>
+<p>第3步：向量化，需要使用EmbeddingModels。</p>
+<p>第7步：重排序，需要使用RerankModels（追求回答高精度和高相关性的场景）。</p>
+<p>第9步：生成答案，需要使用LLM。</p>
+<p><strong>RAG的优点</strong></p>
+<ol>
+<li><strong>知识实时更新</strong>：只需更新知识库，即可让模型获取最新信息，解决知识冻结问题</li>
+<li><strong>成本效益高</strong>：相比微调，仅需构建知识库，成本低，且避免了微调可能带来的“灾难性遗忘”问题</li>
+<li><strong>可信度高，可溯源</strong>：答案有据可查，可提供引用来源，有效减少模型“幻觉”。</li>
+<li><strong>安全可控</strong>：可限制模型只基于提供的知识回答，避免泄露敏感信息或产生有害内容。</li>
+</ol>
+<p><strong>RAG的缺点</strong></p>
+<ol>
+<li><strong>检索质量是瓶颈</strong>：效果高度依赖于检索器的准确性。不相关的检索结果会直接导致回答错误。</li>
+<li><strong>系统复杂性高</strong>：需维护检索、向量数据库等多个组件，比直接调用API复杂得多。</li>
+<li><strong>上下文窗口受限</strong>：检索内容会消耗宝贵的上下文窗口，可能挤占大模型的推理空间。</li>
+<li><strong>对知识库质量极度敏感</strong>：如果外部知识库本身质量差（内容错误、格式混乱、信息过时），那么RAG系统的输出质量也必然无法保证。</li>
+</ol>
+<h3 id="8-4-Retrieval流程"><a href="#8-4-Retrieval流程" class="headerlink" title="8.4 Retrieval流程"></a>8.4 Retrieval流程</h3><p><img src="https://github.com/user-attachments/assets/8a0a6147-cc68-43fd-a970-568b16cee1c3" alt="Image"></p>
+<p><strong>阶段一：Source（数据源）</strong>，外部知识库，包含各种类型、格式的文件，如图片、视频、网站等</p>
+<p><strong>阶段二：Load（加载）</strong>，将外部知识库加载到内存中并转换成文档(Document)对象。包含内容和元数据等相关信息。</p>
+<p><strong>阶段三：Transform（转换）</strong>，将文档对象转换为更适合检索和生成的表达形式。包括文本分块、清理冗余信息、关键信息提取等，旨在提升后续处理的效率与质量</p>
+<p><strong>阶段四：Embed（嵌入）</strong>，通过嵌入模型将文本转换为高纬度空间中的数值向量，使得计算机能够理解和处理语义信息，文本可用于向量空间中的各种运算，大大拓展了文本分析的可能性，是自然语言处理领域非常重要的技术。</p>
+<p>a. 实现原理：通过特定算法 （如Word2Vec）将语义信息编码为固定维度的向量。</p>
+<p>b. 关键特性：相似的词在向量空间中距离相近，例如“猫”和“狗”的向量夹角小于“猫”和“汽车”。</p>
+<p><img src="https://github.com/user-attachments/assets/c8de225e-4783-49d7-b277-4dc8fd592e30" alt="Image"></p>
+<p>文本嵌入为 LangChain 中的问答、检索、推荐等功能提供了重要支持。具体为：</p>
+<ol>
+<li>语义匹配：通过计算两个文本的向量余弦相似度，判断它们在语义上的相似程度，实现语义匹配。</li>
+<li>文本检索：通过计算不同文本之间的向量相似度，可以实现语义搜索，找到向量空间中最相似的文本。</li>
+<li>信息推荐：根据用户的历史记录或兴趣嵌入生成用户向量，计算不同信息的向量与用户向量的相似度，推荐相似的信息。</li>
+<li>知识挖掘：可以通过聚类、降维等手段分析文本向量的分布，发现文本之间的潜在关联，挖掘知识。</li>
+<li>自然语言处理：将词语、句子等表示为稠密向量，为神经网络等下游任务提供输入。</li>
+</ol>
+<p><strong>阶段五：Store（存储）</strong>，将转换后的向量存储在向量数据库中，避免需要时重新计算。</p>
+<p><img src="https://github.com/user-attachments/assets/690fccaf-085e-4693-b9e9-c17c807c8ccb" alt="Image"></p>
+<h3 id="8-5-Retrieval组件使用"><a href="#8-5-Retrieval组件使用" class="headerlink" title="8.5 Retrieval组件使用"></a>8.5 Retrieval组件使用</h3><p><strong>1、Document Loaders（文档加载器）</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加载txt文件</span></span><br><span class="line">text_loader = TextLoader(<span class="string">&quot;./risk.txt&quot;</span>)</span><br><span class="line">docs = text_loader.load()</span><br><span class="line"><span class="comment"># print(docs)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载pdf文件</span></span><br><span class="line">pdf_loader = PyPDFLoader(file_path=<span class="string">&quot;./risk.pdf&quot;</span>)</span><br><span class="line">docs = pdf_loader.load()</span><br><span class="line"><span class="built_in">print</span>(docs)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载csv文件</span></span><br><span class="line">csv_loader = CSVLoader(file_path=<span class="string">&quot;./risk.csv&quot;</span>)</span><br><span class="line">docs = csv_loader.load()</span><br><span class="line"><span class="built_in">print</span>(docs)</span><br><span class="line"></span><br><span class="line"><span class="comment">#加载json文件</span></span><br><span class="line">json_loader = JSONLoader(file_path=<span class="string">&quot;./risk.json&quot;</span>)</span><br><span class="line">docs = json_loader.load()</span><br><span class="line"><span class="built_in">print</span>(docs)</span><br></pre></td></tr></table></figure>
+
+<p>Documment对象中有两个重要的属性：</p>
+<p>page_content：真正的文档内容</p>
+<p>metadata：文档内容的元数据</p>
+<p><strong>2、Text Splitters</strong>（<strong>文本拆分器</strong>）</p>
+<p><img src="https://github.com/user-attachments/assets/677bd5fa-a700-433d-a7d2-90b609143fa6" alt="Image"></p>
+<p>文本拆分器是将长文档拆分为语义连贯、大小适中的小片段，<strong>主要是解决大模型的上下文窗口限制，并提升检索的准确性和生成内容的质量</strong>。它的工作原理通常遵循“先细拆后合并”的策略：首先将文本分割成小句子，然后按顺序将这些小句子合并成较大的块，直到达到设定的块大小限制。在创建新块时，会与上一个块保留部分重叠，以确保上下文连贯。</p>
+<p>为什么需要分隔？</p>
+<p>a. <strong>保证生成答案质量</strong>：如果检索到的文本块过大且包含大量无关信息，LLM 可能会被无关内容干扰，无法聚焦于核心问题，甚至可能将无关信息错误地整合进答案，导致生成内容不准确或冗长。</p>
+<p>b. <strong>突破模型上下文窗口限制</strong>：所有大模型都有一个固定的上下文窗口，即模型能一次性“看到”并处理的文本总量是有限的。</p>
+<p>c. <strong>提升检索的精准度</strong>：检索系统可以直接定位到专门回答该问题的段落，极大地提升了检索结果的相关性和准确性。</p>
+<p>基于此，一个有效的解决方案就是将完整的Document对象进行分块处理（Chunking) 。无论是在存储还是检索过程中，都将以这些块(chunks) 为基本单位，这样有效地避免内容不相关性问题和超出最大输入限制的问题。</p>
+<p>Chunking拆分的策略：</p>
+<ol>
+<li>固定长度切分：严格按照预设的固定字符数或 Token 数进行切分，是最简单直接的方法。</li>
+<li>递归切分：采用分层分隔符策略，优先使用大粒度分隔符切分，若不满足大小要求，则逐级使用更小粒度的分隔符递归切分，直到达到目标块大小。默认分隔符顺序为 [“\n\n”, “\n”, “。”, “，”, “ “, “”]，它会优先按段落、句子、标点进行切分，能有效保留句子和段落的完整性</li>
+<li>基于文档结构的切分：利用文档固有的格式和结构进行切分，如 Markdown 的标题、HTML 的标签、代码文件的函数&#x2F;类定义等。</li>
+<li>语义分块：它利用嵌入模型计算句子或段落的向量表示，然后通过分析向量间的相似度来动态确定切分点，将语义相近的内容聚合到同一个块中，旨在保持相关信息的集中和完整。</li>
+</ol>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">text_loader = TextLoader(<span class="string">&quot;./risk.txt&quot;</span>)</span><br><span class="line">docs = text_loader.load()</span><br><span class="line">text_splitter = CharacterTextSplitter(</span><br><span class="line">    <span class="comment"># 文本块大小：每个分割块的最大字符数，1000字符通常包含150-200个中文词汇，适合大多数LLM的上下文窗口处理</span></span><br><span class="line">    chunk_size=<span class="number">1000</span>,</span><br><span class="line">    <span class="comment"># 文本块重叠：相邻块之间的重叠字符数，设置为0表示无重叠，节省存储空间，通常设置为chunk_size的10-20%以保持上下文连续性</span></span><br><span class="line">    chunk_overlap=<span class="number">0</span>,</span><br><span class="line">    <span class="comment"># 长度计算函数：用于计算文本长度的函数，len()函数按字符计数，适合中英文混合文本，也可以使用token计数函数获得更精确的控制</span></span><br><span class="line">    length_function=<span class="built_in">len</span>,</span><br><span class="line">    <span class="comment"># 分割符：优先按换行符分割文本，保持段落结构的完整性，避免句子被截断</span></span><br><span class="line">    separator=<span class="string">&quot;\n&quot;</span></span><br><span class="line">)</span><br><span class="line">texts = text_splitter.split_text(docs[<span class="number">0</span>].page_content)</span><br><span class="line"><span class="built_in">print</span>(texts)</span><br></pre></td></tr></table></figure>
+
+<p>除了CharacterTextSplitter，LangChain还提供了很多拆分器，如：RecursiveCharacterTextSplitter、TokenTextSplitter、CharacterTextSplitter、SemanticChunker、HTMLHeaderTextSplitter等。具体使用可参考官方文档：<a target="_blank" rel="noopener" href="https://python.langchain.com.cn/docs/modules/data_connection/document_transformers/">https://python.langchain.com.cn/docs/modules/data_connection/document_transformers/</a></p>
+<p><strong>3、Text Embedding Models（文档嵌入模型）</strong></p>
+<p>将文本转换为数值向量</p>
+<p><img src="https://github.com/user-attachments/assets/a757a0f1-d4ce-416b-9dbb-882d96605f1c" alt="Image"></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">embeddings_model = OllamaEmbeddings(</span><br><span class="line">    model=<span class="string">&quot;nomic-embed-text&quot;</span>,</span><br><span class="line">    base_url=<span class="string">&quot;http://127.0.0.1:11434&quot;</span>,</span><br><span class="line">)</span><br><span class="line">text = <span class="string">&quot;Hello World&quot;</span></span><br><span class="line"><span class="comment"># 句子向量化</span></span><br><span class="line">vector = embeddings_model.embed_query(text=text)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;嵌入向量长度: <span class="subst">&#123;<span class="built_in">len</span>(vector)&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;前20个值: <span class="subst">&#123;vector[:<span class="number">20</span>]&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;=======================================&quot;</span>)</span><br><span class="line"></span><br><span class="line">texts = [<span class="string">&quot;Hello World&quot;</span>, <span class="string">&quot;Today is a sunny day&quot;</span>, <span class="string">&quot;No news is good news&quot;</span>]</span><br><span class="line"><span class="comment"># 文档向量化</span></span><br><span class="line">vector = embeddings_model.embed_documents(texts)</span><br><span class="line"><span class="keyword">for</span> v <span class="keyword">in</span> vector:</span><br><span class="line">  <span class="built_in">print</span>(<span class="string">f&quot;前20个值: <span class="subst">&#123;v[:<span class="number">20</span>]&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/user-attachments/assets/4678f358-5e24-4988-a8cc-df5376ec4793" alt="Image"></p>
+<p><strong>4、Vector Stores（向量存储）</strong></p>
+<p><img src="https://github.com/user-attachments/assets/3e96a47f-4bf8-4f94-a919-0b99012a2558" alt="Image"></p>
+<p>将文本向量化之后，下一步就是进行向量的存储。这里有两部分：</p>
+<p>a. <strong>向量的存储</strong> ：将非结构化数据向量化后，存储在向量数据库。</p>
+<p>b. <strong>向量的查询</strong> ：查询时，嵌入非结构化查询并检索与嵌入查询“最相似”的嵌入向量。即具有相似性检索能力。</p>
+<p>LangChain提供了50多种不同的向量数据库，参考文档：向量存储</p>
+<p><a target="_blank" rel="noopener" href="https://docs.langchain.com/oss/python/langchain/overview">https://docs.langchain.com/oss/python/langchain/overview</a></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加载txt文件</span></span><br><span class="line">text_loader = TextLoader(<span class="string">&quot;./risk.txt&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line">docs = text_loader.load()</span><br><span class="line"><span class="comment"># 文本分割</span></span><br><span class="line">text_splitter = CharacterTextSplitter(chunk_size=<span class="number">1000</span>, chunk_overlap=<span class="number">0</span>)</span><br><span class="line">text_docs = text_splitter.split_documents(docs)</span><br><span class="line"><span class="comment"># 向量存储，默认存储在内存中， 可通过persistent_directory参数指定存储磁盘路径</span></span><br><span class="line">vectorstore = Chroma.from_documents(text_docs, embeddings_model, persistent_directory=<span class="string">&#x27;./chroma_db&#x27;</span>)</span><br><span class="line"><span class="comment"># 相似度搜索，除了similarity_search外，</span></span><br><span class="line"><span class="comment"># 1、直接对问题向量查询（similarity_search_by_vector）</span></span><br><span class="line"><span class="comment"># 2、通过L2距离分数进行搜索（similarity_search_with_score）</span></span><br><span class="line"><span class="comment"># 3、通过余弦相似度分数进行搜索（similarity_search_with_relevance_scores）</span></span><br><span class="line"><span class="comment"># 4、MMR（最大边际相关性，max_marginal_relevance_search）</span></span><br><span class="line">response = vectorstore.similarity_search(<span class="string">&quot;什么是反洗钱？&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p><strong>5、Retrievers（检索器）</strong></p>
+<p><img src="https://github.com/user-attachments/assets/45a40b33-f61d-4899-a93d-7f9ddf906d20" alt="Image"></p>
+<p>向量数据库提供了核心的相似性计算能力，其内置函数（如余弦相似度，欧式距离，点积等）可直接用于实现基础的向量召回。LangChain还提供了 更加复杂的召回策略 ，这些策略被集成在Retrievers（检索器）组件中。检索器本身不存储数据，而是通过查询向量数据库，并集成重排序、多路检索等高级逻辑，最终返回相关的文档片段。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># # 加载txt文件</span></span><br><span class="line">text_loader = TextLoader(<span class="string">&quot;./risk.txt&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line">docs = text_loader.load()</span><br><span class="line">text_splitter = CharacterTextSplitter(chunk_size=<span class="number">1000</span>, chunk_overlap=<span class="number">0</span>)</span><br><span class="line">text_docs = text_splitter.split_documents(docs)</span><br><span class="line"><span class="comment"># 向量存储，默认存储在内存中， 可通过persistent_directory参数指定存储磁盘路径</span></span><br><span class="line">vectorstore = Chroma.from_documents(docs, embeddings_model, persistent_directory=<span class="string">&#x27;./chroma_db&#x27;</span>)</span><br><span class="line"><span class="comment"># 创建检索器</span></span><br><span class="line">retriever = vectorstore.as_retriever(</span><br><span class="line">    <span class="comment"># 搜索参数，k表示返回的文档数量，score_threshold表示相似度阈值</span></span><br><span class="line">    search_kwargs=&#123;<span class="string">&quot;k&quot;</span>: <span class="number">2</span>, <span class="string">&quot;score_threshold&quot;</span>: <span class="number">0.5</span>&#125;,</span><br><span class="line">    <span class="comment"># 搜索类型</span></span><br><span class="line">    search_type=<span class="string">&quot;similarity_score_threshold&quot;</span></span><br><span class="line">)</span><br><span class="line">chain = retriever | chat_model</span><br><span class="line">response = chain.invoke(<span class="string">&quot;什么是反洗钱？&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<h2 id="9-再谈LangChain"><a href="#9-再谈LangChain" class="headerlink" title="9. 再谈LangChain"></a>9. 再谈LangChain</h2><p>到这想必对LangChain有一个清晰的认识了，为了更形象地理解，如果将LLM比作人类的”大脑“，那么LangChain中的组件就像：</p>
+<ol>
+<li><strong>LLM（大语言模型） ——  大脑</strong></li>
+</ol>
+<p>整个系统的核心，负责思考、推理、理解和生成。就像人类的大脑，是智能的中枢。它接收来自各方的信息，进行处理，并做出决策或生成回应。</p>
+<ol start="2">
+<li><strong>RAG &amp; VectorStore（检索增强生成与向量数据库） ——  图书馆&#x2F;长期记忆</strong></li>
+</ol>
+<p>存储海量的专业知识（公司文档、知识库等），并能在需要时快速、准确地检索相关信息提供给“大脑”。它是一个巨大的私人图书馆或长期记忆仓库，当你需要解决一个专业问题时，你会来图书馆查阅相关资料，然后将这些资料带给大脑（LLM）进行参考和分析。</p>
+<ol start="3">
+<li><strong>Agents（智能体） ——  神经系统&#x2F;小脑</strong></li>
+</ol>
+<p>负责决策“如何”完成任务。它接收用户指令，进行规划，决定是直接由大脑（LLM）回答，还是需要调用各种工具（Tools），并按照什么顺序来执行。就像人体的神经系统或小脑。大脑（LLM）负责出主意，而Agent负责协调身体各部分去执行这个主意。例如，你想“拿一杯水”，大脑发出指令，神经系统（Agent）会规划并协调眼睛（观察）、手（抓取）等一系列动作。</p>
+<ol start="4">
+<li><strong>Tools（工具） ——  手、脚和感官</strong></li>
+</ol>
+<p>是Agent可以调用的具体功能，用于与外部世界交互。就像人的手、脚、眼睛和耳朵。</p>
+<ol start="5">
+<li><strong>Chains（链） ——  技能或肌肉记忆</strong></li>
+</ol>
+<p>将多个步骤（LLM调用、工具使用、数据处理）预先定义并链接在一起，形成一个可重复执行的固定流程。像是你学会的一种“技能”或“肌肉记忆”。例如，“泡咖啡”这个技能就是一个链：走到咖啡机前 -&gt; 加咖啡粉 -&gt; 按开关 -&gt; 等待 -&gt; 拿杯子。一旦学会，你就可以不假思索地完成。</p>
+<ol start="6">
+<li><strong>Memory（记忆） ——  短期记忆&#x2F;对话记忆</strong></li>
+</ol>
+<p>用于存储和回顾当前对话的历史信息，使AI能够拥有上下文感知能力，实现连贯的多轮对话。就像你的短期记忆。它让你记得在刚才的对话中对方说了什么，从而能做出相关的回应。没有记忆，每一次对话都是全新的、孤立的。</p>
+<ol start="7">
+<li><strong>PromptTemplates（提示模板） ——  沟通技巧&#x2F;提问模板</strong></li>
+</ol>
+<p>预先设计好的、结构化的提示词，用于更有效、更稳定地向LLM提问。就像沟通技能、演讲技能，写作技能，都有一套固定的模版。</p>
+<p>通过这个比喻，我们可以清晰地看到：<strong>LLM是智能的核心（脑）、RAG是知识储备（图书馆）、Agents是协调指挥官（神经系统）、Tools是执行手段（手脚）、Chains是自动化技能（肌肉记忆）、Memory是上下文感知（短期记忆）</strong>，它们各司其职，紧密协作，共同构成了一个能够理解、推理并作用于外部世界的智能体。</p>
+<h3 id="LangChain相关资料地址如下："><a href="#LangChain相关资料地址如下：" class="headerlink" title="LangChain相关资料地址如下："></a>LangChain相关资料地址如下：</h3><p>LangChain 官网地址： <a target="_blank" rel="noopener" href="https://www.langchain.com/langchain">https://www.langchain.com/langchain</a><br>LangChain 官网文档： <a target="_blank" rel="noopener" href="https://python.langchain.com/docs/introduction/">https://python.langchain.com/docs/introduction/</a><br>LangChan API文档： <a target="_blank" rel="noopener" href="https://python.langchain.com/api_reference/">https://python.langchain.com/api_reference/</a><br>LangChain github地址： <a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain">https://github.com/langchain-ai/langchain</a><br>LangChain中文网： <a target="_blank" rel="noopener" href="https://python.langchain.com.cn/docs/">https://python.langchain.com.cn/docs/</a><br>Open AI中文文档： <a target="_blank" rel="noopener" href="https://openai.xiniushu.com/">https://openai.xiniushu.com/</a></p>
+
+                            </div>
+
+                            
+                                <section class="post-copyright">
+                                    
+                                        <p class="copyright-item">
+                                            <span>Author:</span>
+                                            <span>yyhappynice</span>
+                                        </p>
+                                        
+                                            
+                                                <p class="copyright-item">
+                                                    <span>Permalink:</span>
+                                                    <span><a href="https://yyhappynice.github.io/2025/11/06/langChainjs1/">https://yyhappynice.github.io/2025/11/06/langChainjs1/</a></span>
+                                                </p>
+                                                
+                                                    
+                                                        <p class="copyright-item">
+                                                            <span>License:</span>
+                                                            <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                                                        </p>
+                                                        
+                                                            
+                                                                <p class="copyright-item">
+                                                                    <span>Slogan:</span>
+                                                                    <span>Do you believe in <strong>DESTINY</strong>?</span>
+                                                                </p>
+                                                                
+
+                                </section>
+                                
+                                    <section class="post-tags">
+                                        <div>
+                                            <span>Tag(s):</span>
+                                            <span class="tag">
+                                                
+                                                    
+                                                        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"># 人工智能</a>
+                                                        
+                                                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"># 机器学习</a>
+                                                        
+                                                            
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:window.history.back();">back</a>
+                                            <span>· </span>
+                                            <a href="/">home</a>
+                                        </div>
+                                    </section>
+                                    <section class="post-nav">
+                                        
+                                                
+                                                    <a class="next" rel="next" href="/2025/10/18/ai-base5/">从 Prompt 到上下文工程构建 Agent</a>
+                                                    
+                                    </section>
+
+                                    <script src="https://giscus.app/client.js" data-repo="yyhappynice/yyhappynice.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxNTk5NTcwNzA=" data-category="Announcements" data-category-id="DIC_kwDOCYjATs4Cwd0z"
+  data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+  data-theme="preferred_color_scheme" data-lang="zh-CN" crossorigin="anonymous" async>
+  </script>
+
+                        </article>
+</div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© yyhappynice | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
