@@ -784,7 +784,7 @@ AgentType.OPENAIMULTI_FUNCTIONS
 
 ![Image](https://github.com/user-attachments/assets/68844d0f-c9be-410e-ac73-3206122fa3f2)
 
-将复杂任务拆解成，**Thought (推理) → Action (行动，即调用工具) → Observation (观察结果) → ... → Final Answer（最终答案）**的循环步骤：
+将复杂任务拆解成，**Thought (推理) → Action (行动，即调用工具) → Observation (观察结果) → ... → Final Answer**（**最终答案**）的循环步骤：
 
 
 a. **Thought（思考）**：大模型首先会分析当前情况，并思考下一步应该做什么以及为什么这么做。
@@ -993,8 +993,161 @@ b. 关键特性：相似的词在向量空间中距离相近，例如“猫”�
 
 **1、Document Loaders（文档加载器）**
 
+```py
+# 加载txt文件
+text_loader = TextLoader("./risk.txt")
+docs = text_loader.load()
+# print(docs)
 
----
+# 加载pdf文件
+pdf_loader = PyPDFLoader(file_path="./risk.pdf")
+docs = pdf_loader.load()
+print(docs)
+
+# 加载csv文件
+csv_loader = CSVLoader(file_path="./risk.csv")
+docs = csv_loader.load()
+print(docs)
+
+#加载json文件
+json_loader = JSONLoader(file_path="./risk.json")
+docs = json_loader.load()
+print(docs)
+```
+
+Documment对象中有两个重要的属性：
+
+page_content：真正的文档内容
+
+metadata：文档内容的元数据
+
+**2、Text Splitters**（**文本拆分器**）
+
+![Image](https://github.com/user-attachments/assets/677bd5fa-a700-433d-a7d2-90b609143fa6)
+
+文本拆分器是将长文档拆分为语义连贯、大小适中的小片段，**主要是解决大模型的上下文窗口限制，并提升检索的准确性和生成内容的质量**。它的工作原理通常遵循“先细拆后合并”的策略：首先将文本分割成小句子，然后按顺序将这些小句子合并成较大的块，直到达到设定的块大小限制。在创建新块时，会与上一个块保留部分重叠，以确保上下文连贯。
+
+为什么需要分隔？
+
+a. **保证生成答案质量**：如果检索到的文本块过大且包含大量无关信息，LLM 可能会被无关内容干扰，无法聚焦于核心问题，甚至可能将无关信息错误地整合进答案，导致生成内容不准确或冗长。
+
+b. **突破模型上下文窗口限制**：所有大模型都有一个固定的上下文窗口，即模型能一次性“看到”并处理的文本总量是有限的。
+
+c. **提升检索的精准度**：检索系统可以直接定位到专门回答该问题的段落，极大地提升了检索结果的相关性和准确性。
+
+基于此，一个有效的解决方案就是将完整的Document对象进行分块处理（Chunking) 。无论是在存储还是检索过程中，都将以这些块(chunks) 为基本单位，这样有效地避免内容不相关性问题和超出最大输入限制的问题。
+
+Chunking拆分的策略：
+
+1. 固定长度切分：严格按照预设的固定字符数或 Token 数进行切分，是最简单直接的方法。
+2. 递归切分：采用分层分隔符策略，优先使用大粒度分隔符切分，若不满足大小要求，则逐级使用更小粒度的分隔符递归切分，直到达到目标块大小。默认分隔符顺序为 ["\n\n", "\n", "。", "，", " ", ""]，它会优先按段落、句子、标点进行切分，能有效保留句子和段落的完整性
+3. 基于文档结构的切分：利用文档固有的格式和结构进行切分，如 Markdown 的标题、HTML 的标签、代码文件的函数/类定义等。
+4. 语义分块：它利用嵌入模型计算句子或段落的向量表示，然后通过分析向量间的相似度来动态确定切分点，将语义相近的内容聚合到同一个块中，旨在保持相关信息的集中和完整。
+
+```py
+text_loader = TextLoader("./risk.txt")
+docs = text_loader.load()
+text_splitter = CharacterTextSplitter(
+    # 文本块大小：每个分割块的最大字符数，1000字符通常包含150-200个中文词汇，适合大多数LLM的上下文窗口处理
+    chunk_size=1000,
+    # 文本块重叠：相邻块之间的重叠字符数，设置为0表示无重叠，节省存储空间，通常设置为chunk_size的10-20%以保持上下文连续性
+    chunk_overlap=0,
+    # 长度计算函数：用于计算文本长度的函数，len()函数按字符计数，适合中英文混合文本，也可以使用token计数函数获得更精确的控制
+    length_function=len,
+    # 分割符：优先按换行符分割文本，保持段落结构的完整性，避免句子被截断
+    separator="\n"
+)
+texts = text_splitter.split_text(docs[0].page_content)
+print(texts)
+```
+
+除了CharacterTextSplitter，LangChain还提供了很多拆分器，如：RecursiveCharacterTextSplitter、TokenTextSplitter、CharacterTextSplitter、SemanticChunker、HTMLHeaderTextSplitter等。具体使用可参考官方文档：https://python.langchain.com.cn/docs/modules/data_connection/document_transformers/
+
+**3、Text Embedding Models（文档嵌入模型）**
+
+将文本转换为数值向量
+
+![Image](https://github.com/user-attachments/assets/a757a0f1-d4ce-416b-9dbb-882d96605f1c)
+
+```py
+embeddings_model = OllamaEmbeddings(
+    model="nomic-embed-text",
+    base_url="http://127.0.0.1:11434",
+)
+text = "Hello World"
+# 句子向量化
+vector = embeddings_model.embed_query(text=text)
+print(f"嵌入向量长度: {len(vector)}")
+print(f"前20个值: {vector[:20]}")
+
+print("=======================================")
+
+texts = ["Hello World", "Today is a sunny day", "No news is good news"]
+# 文档向量化
+vector = embeddings_model.embed_documents(texts)
+for v in vector:
+  print(f"前20个值: {v[:20]}")
+```
+
+![Image](https://github.com/user-attachments/assets/4678f358-5e24-4988-a8cc-df5376ec4793)
+
+**4、Vector Stores（向量存储）**
+
+![Image](https://github.com/user-attachments/assets/3e96a47f-4bf8-4f94-a919-0b99012a2558)
+
+将文本向量化之后，下一步就是进行向量的存储。这里有两部分：
+
+a. **向量的存储** ：将非结构化数据向量化后，存储在向量数据库。
+
+b. **向量的查询** ：查询时，嵌入非结构化查询并检索与嵌入查询“最相似”的嵌入向量。即具有相似性检索能力。
+
+LangChain提供了50多种不同的向量数据库，参考文档：向量存储
+
+https://docs.langchain.com/oss/python/langchain/overview
+
+```py
+# 加载txt文件
+text_loader = TextLoader("./risk.txt", encoding="utf-8")
+docs = text_loader.load()
+# 文本分割
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+text_docs = text_splitter.split_documents(docs)
+# 向量存储，默认存储在内存中， 可通过persistent_directory参数指定存储磁盘路径
+vectorstore = Chroma.from_documents(text_docs, embeddings_model, persistent_directory='./chroma_db')
+# 相似度搜索，除了similarity_search外，
+# 1、直接对问题向量查询（similarity_search_by_vector）
+# 2、通过L2距离分数进行搜索（similarity_search_with_score）
+# 3、通过余弦相似度分数进行搜索（similarity_search_with_relevance_scores）
+# 4、MMR（最大边际相关性，max_marginal_relevance_search）
+response = vectorstore.similarity_search("什么是反洗钱？")
+print(response)
+```
+
+**5、Retrievers（检索器）**
+
+![Image](https://github.com/user-attachments/assets/45a40b33-f61d-4899-a93d-7f9ddf906d20)
+
+向量数据库提供了核心的相似性计算能力，其内置函数（如余弦相似度，欧式距离，点积等）可直接用于实现基础的向量召回。LangChain还提供了 更加复杂的召回策略 ，这些策略被集成在Retrievers（检索器）组件中。检索器本身不存储数据，而是通过查询向量数据库，并集成重排序、多路检索等高级逻辑，最终返回相关的文档片段。
+
+```py
+# # 加载txt文件
+text_loader = TextLoader("./risk.txt", encoding="utf-8")
+docs = text_loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+text_docs = text_splitter.split_documents(docs)
+# 向量存储，默认存储在内存中， 可通过persistent_directory参数指定存储磁盘路径
+vectorstore = Chroma.from_documents(docs, embeddings_model, persistent_directory='./chroma_db')
+# 创建检索器
+retriever = vectorstore.as_retriever(
+    # 搜索参数，k表示返回的文档数量，score_threshold表示相似度阈值
+    search_kwargs={"k": 2, "score_threshold": 0.5},
+    # 搜索类型
+    search_type="similarity_score_threshold"
+)
+chain = retriever | chat_model
+response = chain.invoke("什么是反洗钱？")
+print(response)
+```
 
 ## 9. 再谈LangChain
 
