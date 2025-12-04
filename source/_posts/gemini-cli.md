@@ -161,7 +161,7 @@ tags:
 
 #### 3.3.2 统一的“工具注册表”
 
-所有内置或外部的工具，会被工具注册表ToolRegistry（位于 `packages/core/src/tools/tool-registry.ts`）来管理。
+所有内置或外部的工具，会被工具注册表ToolRegistry（位于 packages/core/src/tools/tool-registry.ts）来管理。
 
 在应用启动时，Config模块会负责创建所有内置工具的实例，并逐一注册到表中。当需要与大模型交互时，系统会从注册表中提取所有工具的“声明”信息，统一提交给模型，让模型知道它当前拥有哪些可用的能力。同样，当模型请求执行某个工具时，调度器也会通过注册表来查找并执行它。
 
