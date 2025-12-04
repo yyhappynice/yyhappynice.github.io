@@ -1227,45 +1227,43 @@ header .menu label {
   }
 }
 body:not(.dark-theme) .highlight {
-  color: #68615e;
-  background: #f7f7f7;
+  background: #222;
+  color: #fff;
 }
 body:not(.dark-theme) .highlight .code .comment,
 body:not(.dark-theme) .highlight .code .quote {
-  color: #766e6b;
+  color: #777;
 }
 body:not(.dark-theme) .highlight .code .variable,
 body:not(.dark-theme) .highlight .code .template-variable,
-body:not(.dark-theme) .highlight .code .attribute,
 body:not(.dark-theme) .highlight .code .tag,
-body:not(.dark-theme) .highlight .code .name,
 body:not(.dark-theme) .highlight .code .regexp,
-body:not(.dark-theme) .highlight .code .link,
-body:not(.dark-theme) .highlight .code .selector-id,
-body:not(.dark-theme) .highlight .code .selector-class {
-  color: #f22c40;
-}
-body:not(.dark-theme) .highlight .code .number,
 body:not(.dark-theme) .highlight .code .meta,
+body:not(.dark-theme) .highlight .code .number,
 body:not(.dark-theme) .highlight .code .built_in,
 body:not(.dark-theme) .highlight .code .builtin-name,
 body:not(.dark-theme) .highlight .code .literal,
+body:not(.dark-theme) .highlight .code .params,
+body:not(.dark-theme) .highlight .code .symbol,
+body:not(.dark-theme) .highlight .code .bullet,
+body:not(.dark-theme) .highlight .code .link,
+body:not(.dark-theme) .highlight .code .deletion {
+  color: #ab875d;
+}
+body:not(.dark-theme) .highlight .code .section,
+body:not(.dark-theme) .highlight .code .title,
+body:not(.dark-theme) .highlight .code .name,
+body:not(.dark-theme) .highlight .code .selector-id,
+body:not(.dark-theme) .highlight .code .selector-class,
 body:not(.dark-theme) .highlight .code .type,
-body:not(.dark-theme) .highlight .code .params {
-  color: #df5320;
+body:not(.dark-theme) .highlight .code .attribute {
+  color: #9b869b;
 }
 body:not(.dark-theme) .highlight .code .string,
-body:not(.dark-theme) .highlight .code .symbol,
-body:not(.dark-theme) .highlight .code .bullet {
-  color: #7b9726;
-}
-body:not(.dark-theme) .highlight .code .title,
-body:not(.dark-theme) .highlight .code .section {
-  color: #407ee7;
-}
 body:not(.dark-theme) .highlight .code .keyword,
-body:not(.dark-theme) .highlight .code .selector-tag {
-  color: #6666ea;
+body:not(.dark-theme) .highlight .code .selector-tag,
+body:not(.dark-theme) .highlight .code .addition {
+  color: #8f9c6c;
 }
 body:not(.dark-theme) .highlight .code .emphasis {
   font-style: italic;

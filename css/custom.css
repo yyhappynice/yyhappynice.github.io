@@ -1,0 +1,73 @@
+body {
+  font-size: 15px;
+}
+body:not(.dark-theme) .highlight {
+  background: rgba(0,0,0,0.02);
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+}
+.post-wrap .archive-item {
+  line-height: normal;
+  height: 36px;
+  display: flex;
+  justify-content: space-between;
+}
+.post-content figure.highlight .code pre {
+  margin: 0;
+}
+.post-content blockquote {
+  border-left: 4px solid rgba(0,82,255,0.878) !important;
+  background: rgba(0,82,255,0.059);
+}
+.post-content a {
+  color: #ef3982;
+}
+.post-content table thead {
+  background: rgba(0,82,255,0.9);
+  color: #fff;
+}
+.post-content h2 {
+  font-size: 1.4em;
+  color: #0052ff;
+}
+.post-content h2::before {
+  color: #0052ff;
+}
+.post-content h3 {
+  position: relative;
+  display: block;
+  color: #0052ff;
+}
+.post-content h3::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 68%;
+  transform: translateY(-68%);
+  width: 6px;
+  height: 28px;
+  background: #ffdaa9;
+}
+.post-content h3::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 68%;
+  transform: translateY(-68%);
+  width: 6px;
+  height: 28px;
+  background: #0052ff;
+}
+.post-content h3 a {
+  padding-left: 10px;
+}
+.post-content h4::before {
+  color: #0052ff;
+}
+.post-content ol {
+  padding-left: 30px;
+}
+.post-content ol li::marker {
+  font-weight: 500;
+  font-style: italic;
+}
