@@ -3,7 +3,6 @@ title: AI 相关文章记录
 date: 2025-8-24 15:30:00
 categories:
   - 技术教程
-  - 编程
 tags:
   - JavaScript
   - 前端开发

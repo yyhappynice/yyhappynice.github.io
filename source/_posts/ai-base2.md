@@ -5,7 +5,6 @@ categories:
   - ai笔记
 tags:
   - 人工智能
-  - 机器学习
 
 ---
 
