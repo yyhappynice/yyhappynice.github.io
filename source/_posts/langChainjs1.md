@@ -5,7 +5,6 @@ categories:
   - LangChainjs
 tags:
   - 人工智能
-  - 机器学习
 
 ---
 ![langchain](https://github.com/user-attachments/assets/b32fafaa-f59d-46eb-98ac-87c839a8d1fe)

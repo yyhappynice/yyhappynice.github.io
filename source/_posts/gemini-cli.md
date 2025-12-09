@@ -2,7 +2,7 @@
 title: Google gemini-cli 源码解构
 date: 2025-11-18 16:57:08
 categories:
-  - ai笔记
+  - 源码分析
 tags:
   - 脚手架
 ---
